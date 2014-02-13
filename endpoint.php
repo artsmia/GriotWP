@@ -18,7 +18,7 @@ else if( ! in_array( $query_arr[0], array( 'objects', 'stories' ) ) ) {
 	$request = 'all';
 
 }
-else if( 1 == count( $query_arr ) && in_array( $query_arr[0], array( 'objects', 'stories' ) ) {
+else if( 1 == count( $query_arr ) && in_array( $query_arr[0], array( 'objects', 'stories' ) ) ) {
 
 	// e.g. '/griot/objects/'
 	$request = $query_arr[0];
