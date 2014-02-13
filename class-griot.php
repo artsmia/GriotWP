@@ -28,6 +28,9 @@ class Griot{
 	 */
 	function register_object_cpt() {
 
+		global $wp_version;
+		$icon = $wp_version >= 3.8 ? 'dashicons-format-image' : null;
+
 		$labels = array(
 			'name'                => _x( 'Objects', 'Post Type General Name', 'griot' ),
 			'singular_name'       => _x( 'Object', 'Post Type Singular Name', 'griot' ),
@@ -63,7 +66,7 @@ class Griot{
 			'show_in_nav_menus'   => false,
 			'show_in_admin_bar'   => true,
 			'menu_position'       => 5,
-			'menu_icon'						=> 'dashicons-format-image',
+			'menu_icon'           => $icon,
 			'can_export'          => true,
 			'has_archive'         => true,
 			'exclude_from_search' => true,
@@ -82,6 +85,9 @@ class Griot{
 	 * @since 0.0.1
 	 */
 	function register_story_cpt() {
+
+		global $wp_version;
+		$icon = $wp_version >= 3.8 ? 'dashicons-book' : null;
 
 		$labels = array(
 			'name'                => _x( 'Stories', 'Post Type General Name', 'griot' ),
@@ -118,7 +124,7 @@ class Griot{
 			'show_in_nav_menus'   => false,
 			'show_in_admin_bar'   => true,
 			'menu_position'       => 5,
-			'menu_icon'						=> 'dashicons-book',
+			'menu_icon'           => $icon,
 			'can_export'          => true,
 			'has_archive'         => true,
 			'exclude_from_search' => true,
@@ -199,6 +205,23 @@ class Griot{
 	function enqueue_scripts_and_styles() { 
 
 		$screen = get_current_screen();
+
+		// If version is less than 3.8, add dashicons fonts and styles
+		global $wp_version;
+		if( $wp_version < 3.8  && is_admin() ) {
+
+			wp_enqueue_style(
+				'dashicons',
+				plugins_url( 'components/dashicons/dashicons.css', __FILE__ ),
+				false
+			);
+			wp_enqueue_style(
+				'griot_admin',
+				plugins_url( 'css/griot-admin.css', __FILE__ ),
+				false
+			);
+
+		}
 
 		// Editing screens managed by GriotWP
 		$edit_screens = array( 'object', 'story' );

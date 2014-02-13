@@ -1,0 +1,22 @@
+/*
+ * ADMIN INTERFACE - DASHICONS FALLBACK FOR <3.8
+ ******************************************************************************/
+
+#menu-posts-story .menu-icon-post div.wp-menu-image,
+#menu-posts-object .menu-icon-post div.wp-menu-image{
+	background-image: none;
+	font-family:dashicons;
+	font-size:18px;
+	font-style:normal;
+	font-variant:normal;
+	line-height:28px;
+	color:#bbb;
+}
+#menu-posts-story .menu-icon-post div.wp-menu-image:before{
+	content: "\f128";
+	padding-left:3px;
+}
+#menu-posts-object .menu-icon-post div.wp-menu-image:before{
+	content: "\f330" !important;
+	padding-left:3px;
+}
