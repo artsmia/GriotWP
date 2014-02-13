@@ -1,0 +1,23 @@
+<div>
+
+	<repeater label='Views' name='views' label-singular='view' label-plural='views'>
+
+		<annotatedimage label='Image' name='image'>
+
+			<field label='Title' name='title' type='text' />
+
+			<field label='Description' name='description' type='wysiwyg' />
+
+			<repeater label='Attachments' name='attachments' label-singular='attachment' label-plural='attachments'>
+
+				<field name='image' type='image' />
+
+			</repeater>
+
+		</annotatedimage>
+
+	</repeater>
+
+	<field label='Object Description' name='description' type='wysiwyg' />
+
+</div>
