@@ -30,7 +30,7 @@ jQuery( document ).ready( function() {
 			  objectCount = 0,
 			  imageCount = 0;
 
-			for( var prop in config.objects ) {
+			for( var prop in config.grouped ) {
 				if( !isNaN ( parseFloat( prop ) ) && isFinite( prop ) ) {
 					objectCount++;
 				}
