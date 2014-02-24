@@ -153,13 +153,13 @@ An image zoomer with optional annotations. To enable the annotations repeater, s
 
 _zoomerselector_
 
-Dropdown of zoomable images filtered by the selected object. The zoomerselector inherits the **object** attribute of its parent zoomer. It can also be used separately as a generic zoomable image selector. To filter by an object in this case, simply define the **object** attribute on the zoomerselector.
+Dropdown of zoomable images filtered by the selected object. The zoomerselector inherits the object attribute of its parent zoomer. It can also be used separately as a generic zoomable image selector. To filter by an object in this case, simply define the object attribute on the zoomerselector.
 
 #### Additional Zoomer Field Attributes
 
 Zoomer fields have some special attributes:
 
-**object** _Optional_ The **name** attribute of an `<objectselector>` field whose current value should be used to filter the list of zoomable images. This is passed to a zoomerselector embedded within the zoomer field.
+**object** _Optional_ The name attribute of an objectselector field whose current value should be used to filter the list of zoomable images. This is passed to a zoomerselector embedded within the zoomer field.
 
 **annotations-name** _Required for annotations_ The unique key that will refer to the array of annotations in the data object.
 
