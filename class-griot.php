@@ -488,7 +488,7 @@ class Griot{
 			'imageSrc'    => get_option( 'griot_image_source', 'wordpress' ),
 			'imageList'   => $imageList,
 			'tileServer'  => $tileServer,
-			'config'      => $this->get_config( $tileServer ),
+			'config'      => json_decode( $this->get_config( $tileServer ) ),
 
 		);
 
