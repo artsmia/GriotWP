@@ -308,6 +308,12 @@
 	height:500px;
 	margin-top:15px;
 }
+.griot-zoomer.noAnnotations{
+	display:inline-block;
+	width:250px;
+	height:250px;
+	margin:15px 15px 0px 0px;
+}
 
 /*
  * IMAGEPICKERS

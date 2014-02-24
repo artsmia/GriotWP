@@ -1,64 +1,51 @@
 /**
- * <annotatedimage> directive
+ * <zoomer> directive
  *
  * Sets up a (non-isolate) scope and controller and prints fields needed to
  * add and annotate zoomable images.
  */
-angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelChain ) {
+angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 	return {
 
 		restrict: 'E',
-		template: function ( elem, attrs ) {
+		replace:true,
+		template: function( elem, attrs ) {
 
-			// Recursive directives work; recursive transclusion doesn't. But we
-			// need to transfer our uncompiled child fields into our repeater for
-			// rendering. A workaround ...
 			var transcrude = elem.html();
+			attrs.hasAnnotations = transcrude ? true : false;
 
-			return "<div class='griot-annotated-image'>" +
-				"<field protected label='Image ID' name='" + attrs.name + "' type='text' ng-blur='resetZoom()' />" +
-				"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$index || 0}}' />" + 
-				"<repeater annotations label='Annotations' name='annotations' label-singular='annotation' label-plural='annotations'>" +
-					transcrude +
-				"</repeater>" +
-			"</div>";
+			var templateHtml = "<div class='griot-annotated-image'>" +
+				"<field type='zoomerselector' object='" + attrs.object + "' name='" + attrs.name + "' />" +
+				"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$parent.$index || 0}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations }' />";
 
-		},
-		controller: function( $scope, $element, $attrs, ModelChain, $timeout ) {
+			if( transcrude ) {
 
-			// NOTE: Not saving in $scope because scope is shared with arbitrary
-			// parents
-			var _this = this;
+				templateHtml +=	"<repeater annotations label='" + attrs.annotationsLabel + "' name='" + attrs.annotationsName + "' label-singular='" + attrs.annotationsLabelSingular + "' label-plural='" + attrs.annotationsLabelPlural + "'>" +
+						transcrude +
+					"</repeater>";
 
-			// Get reference to current position in data object
-			this.model = ModelChain.getModel( $scope );
-
-			// Set annotations to empty array if not defined
-			if( 'undefined' === typeof this.model[ 'annotations' ] ) { 
-				this.model[ 'annotations' ] = [];
 			}
 
-			// Get reference to annotations
-			this.annotations = this.model[ 'annotations' ];
+			templateHtml += "</div>";
 
-			// Get reference to image id
-			this.imageID = this.model[ $attrs.name ];
+			return templateHtml;
 
-			// Get tileJSON base URL
-			this.tilejson = griotData.tilejson;
+		},
+		controller: function( $scope, $element, $attrs, $timeout ) {
 
+			var _this = this;
 
 			/**
 			 * Check to see if image ID leads to tiles
 			 */
-			this.checkForTiles = function() {
+			$scope.checkForTiles = function() {
 
 				// Get new image ID from model
-				var newImageID = _this.model[ $attrs.name ];
+				var newImageID = $scope.model[ $attrs.name ];
 
 				// Do nothing if zoomer exists and image ID has not changed
-				if( newImageID === _this.imageID && 'undefined' !== typeof _this.zoomer ) {
+				if( newImageID === $scope.imageID && 'undefined' !== typeof $scope.zoomer ) {
 					return;
 				}
 
@@ -69,13 +56,13 @@ angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelCha
 				}
 
 				// Build tile server URL
-				// TODO: Pull from settings.
-				this.tilejson = 'http://tilesaw.dx.artsmia.org/' + newImageID + '.tif';
+				$scope.tilejson = $scope.ui.tileServer + newImageID + '.tif';
 
 				// Get tile data if it exists and build or destroy zoomer accordingly
-				var http = $http.get( _this.tilejson );
+				var http = $http.get( $scope.tilejson );
 				http.success( function( tileData ) { 
 
+					_this.destroyZoomer();
 					_this.buildZoomer( tileData );
 
 				});
@@ -93,9 +80,9 @@ angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelCha
 			 */
 			this.buildZoomer = function( tileData ) {
 
-				_this.imageID = _this.model[ $attrs.name ];
+				$scope.imageID = $scope.model[ $attrs.name ];
 
-				_this.imageLayers = L.featureGroup();
+				$scope.imageLayers = L.featureGroup();
 
 				// Necessary?
 				var tilesURL = tileData.tiles[0].replace( 'http://0', '//0' );
@@ -103,26 +90,30 @@ angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelCha
 				// Get container ID
 				// NOTE: Can't get it on init, because the {{index}} component will 
 				// not have been interpolated by Angular yet
-				_this.container_id = $element.find( '.griot-zoomer' ).first().attr( 'id' );
+				$scope.container_id = $element.find( '.griot-zoomer' ).first().attr( 'id' );
 
 				// Build zoomer and store instance in scope
-				_this.zoomer = Zoomer.zoom_image({
-					container: _this.container_id,
+				$scope.zoomer = Zoomer.zoom_image({
+					container: $scope.container_id,
 					tileURL: tilesURL,
 					imageWidth: tileData.width,
 					imageHeight: tileData.height
 				});
 
-				_this.zoomer.map._zoomAnimated = false;
+				$scope.zoomer.map._zoomAnimated = false;
 
 				// Add feature group to zoomer
-				_this.zoomer.map.addLayer( _this.imageLayers );
+				$scope.zoomer.map.addLayer( $scope.imageLayers );
 
 				_this.loadImageAreas();
 
-				_this.addDrawingControls();
+				if( $scope.hasAnnotations ) {
 
-				_this.watchForExternalDeletion();
+					_this.addDrawingControls();
+
+					_this.watchForExternalDeletion();
+
+				}
 
 			};
 
@@ -132,7 +123,7 @@ angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelCha
 			 */
 			this.loadImageAreas = function() {
 
-				angular.forEach( _this.annotations, function( annotation ) {
+				angular.forEach( this.getAnnotations(), function( annotation ) {
 
 					// Grab geoJSON stored in annotation
 					var geoJSON = annotation.geoJSON;
@@ -144,7 +135,7 @@ angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelCha
 					layer.annotation = annotation;
 
 					// Add to local image layers collection
-					_this.imageLayers.addLayer( layer );
+					$scope.imageLayers.addLayer( layer );
 
 				});
 
@@ -169,12 +160,12 @@ angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelCha
 		       	}
 		      },
 		      edit: {
-		      	featureGroup: _this.imageLayers
+		      	featureGroup: $scope.imageLayers
 		      }
 
 		    });
 
-		    _this.zoomer.map.addControl( drawControl );
+		    $scope.zoomer.map.addControl( drawControl );
 
 			};
 
@@ -189,20 +180,20 @@ angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelCha
 
 					function() {
 
-						return _this.annotations;
+						return _this.getAnnotations();
 
 					},
 					function() {
 
-						if( ! _this.zoomer ) {
+						if( ! $scope.zoomer ) {
 							return;
 						}
 
-						angular.forEach( _this.imageLayers._layers, function( layer ) {
+						angular.forEach( $scope.imageLayers._layers, function( layer ) {
 
-							if( -1 === jQuery.inArray( layer.annotation, _this.annotations ) ) {
+							if( -1 === jQuery.inArray( layer.annotation, _this.getAnnotations() ) ) {
 
-								_this.imageLayers.removeLayer( layer );
+								$scope.imageLayers.removeLayer( layer );
 
 							}
 
@@ -220,19 +211,19 @@ angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelCha
 			 */
 			this.destroyZoomer = function() {
 
-				if( ! _this.zoomer ) {
+				if( ! $scope.zoomer ) {
 					return;
 				}
 
-				_this.zoomer.map.remove();
-				delete _this.zoomer;
+				$scope.zoomer.map.remove();
+				delete $scope.zoomer;
 				$element.find( '.griot-zoomer' ).empty();
-				_this.imageID = null;
-				_this.imageLayers = null;
-				delete Zoomer.zoomers[ _this.container_id ];
+				$scope.imageID = null;
+				$scope.imageLayers = null;
+				delete Zoomer.zoomers[ $scope.container_id ];
 				
 				$timeout( function() {
-					_this.model[ 'annotations' ] = [];
+					$scope.model[ 'annotations' ] = [];
 				});
 
 			}
@@ -242,7 +233,7 @@ angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelCha
 			 * Retrieve the zoomer instance
 			 */
 			this.getZoomer = function() {
-				return _this.zoomer ? _this.zoomer : null; 
+				return $scope.zoomer ? $scope.zoomer : null; 
 			}
 
 
@@ -250,38 +241,49 @@ angular.module( 'griot' ).directive( 'annotatedimage', function( $http, ModelCha
 			 * Retrieve the reference to the annotations repeater
 			 */
 			this.getAnnotations = function() {
-				return _this.annotations;
+				return $scope.model[ $attrs.annotationsName ];;
 			};
 
 			$scope.zoomOut = function() {
-				if( 'undefined' !== typeof _this.zoomer.map ) {
-					_this.zoomer.map.centerImageAtExtents();
+				if( 'undefined' !== typeof $scope.zoomer.map ) {
+					$scope.zoomer.map.centerImageAtExtents();
 				}
 			};
 
 			$scope.hasMap = function() {
-				if( _this.zoomer ) {
+				if( $scope.zoomer ) {
 					return true;
 				} else {
 					return false;
 				}
-			}
+			};
 
 			this.getScope = function() {
 				return $scope;
 			};
 
+			this.getImageLayers = function() {
+				return $scope.imageLayers;
+			};
 
-			// Watch tiledata and rebuild zoomer when it changes.
-			$element.find( '.griot-field-wrap[name=' + $attrs.name + '] input' ).on( 'blur', function() {
+		},
+		link: function( scope, elem, attrs ) {
 
-				_this.checkForTiles();
+			ModelChain.bypassModel( scope );
 
+			scope.hasAnnotations = attrs.hasAnnotations;
+
+			// Get reference to image id
+			scope.imageID = scope.model[ attrs.name ];
+
+			// Initialize
+			scope.checkForTiles();
+
+			elem.find( 'select' ).on( 'change', function() {
+				scope.checkForTiles();
 			});
+	
 
-			// Initialize if image ID is defined
-			_this.checkForTiles();
-		
 		}
 
 	}

@@ -19,8 +19,11 @@ jQuery( document ).ready( function() {
 		// Create main application container and hidden content field
 		.find( '#post-body-content' ).append( "<div id='griot'>" +
 					"<textarea name='content' id='griot-data'>{{ data | json }}</textarea>" +
-					"<fieldset></fieldset>" +
-				"</div>" )
+					"<fieldset>" +
+						"<field type='text' name='objectid' label='Object ID' />" +
+					"</fieldset>" +
+				"</div>" 
+		)
 
 		// Link title field to model
 		.find( '#title' ).attr({

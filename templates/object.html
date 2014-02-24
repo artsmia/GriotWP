@@ -1,23 +1,29 @@
 <div>
 
-	<repeater label='Views' name='views' label-singular='view' label-plural='views'>
+	<field type='objectselector' label='Object' name='object_id' protected />
 
-		<annotatedimage label='Image' name='image'>
+	<repeater name='views' label='Views' label-singular='view' label-plural='views'>
 
-			<field label='Title' name='title' type='text' />
+		<field type='zoomer' name='image' object='object_id' annotations-name='customname' annotations-label='Annotations' annotations-label-singular='annotation' annotations-label-plural='annotations'>
 
-			<field label='Description' name='description' type='wysiwyg' />
+			<!-- annotations -->
 
-			<repeater label='Attachments' name='attachments' label-singular='attachment' label-plural='attachments'>
+			<field type='text' name='title' label='Title' />
 
-				<field name='image' type='image' />
+			<field type='wysiwyg' name='description' label='Description' />
+
+			<repeater name='attachments' label='Attachments' label-singular='attachment' label-plural='attachments'>
+
+				<field type='image' name='image' />
 
 			</repeater>
 
-		</annotatedimage>
+			<!-- / annotations -->
+
+		</field>
 
 	</repeater>
 
-	<field label='Object Description' name='description' type='wysiwyg' />
+	<field type='wysiwyg' name='description' label='Object Description' />
 
 </div>

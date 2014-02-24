@@ -13,6 +13,22 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, ModelChain 
 		recordType: griotData.recordType,
 		oppositeRecordType: griotData.recordType == 'object' ? 'story' : 'object',
 		recordList: griotData.recordList,
+		tileServer: griotData.tileServer,
+		zoomables: griotData.config.all,
+		objects: []
+	}
+	
+	for( var objectid in griotData.config.grouped ) {
+
+		if( 'null' === objectid || '_empty_' === objectid ) {
+			continue;
+		}
+
+		$scope.ui.objects.push({
+			'id':objectid,
+			'zoomables':griotData.config.grouped[ objectid ]
+		});
+
 	}
 
 	// Initialize model chain

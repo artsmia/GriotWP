@@ -8,17 +8,17 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 	return {
 
 		restrict: 'A',
-		require: ['repeater','^annotatedimage'],
+		require: ['repeater','^zoomer'],
 		link: function( scope, elem, attrs, ctrls ) {
 
 			var _this = this;
 
 			// Define controllers
 			var repeaterCtrl = ctrls[0];
-			var imageCtrl = ctrls[1];
+			var zoomerCtrl = ctrls[1];
 
-			// Get imageCtrl scope
-			var imageScope = imageCtrl.getScope();
+			// Get zoomerCtrl scope
+			var imageScope = zoomerCtrl.getScope();
 
 			// Delete Add Annotation button and replace with Zoom Out button
 			var zoomButton = angular.element( "<a class='griot-button' ng-show='hasMap()' ng-click='zoomOut()'>Zoom Out</a>" );
@@ -34,8 +34,8 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 					return repeaterCtrl.getActiveIndex();
 				},
 				function() {
-					var zoomer = imageCtrl.getZoomer();
-					var annotations = imageCtrl.getAnnotations();
+					var zoomer = zoomerCtrl.getZoomer();
+					var annotations = zoomerCtrl.getAnnotations();
 					if( ! annotations[ repeaterCtrl.getActiveIndex() ] ) {
 						return;
 					}
@@ -52,12 +52,12 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 			 */
 			scope.$watch(
 				function() {
-					return imageCtrl.getZoomer();
+					return zoomerCtrl.getZoomer();
 				},
 				function( zoomer ) {
 					if( zoomer ) {
 
-						angular.forEach( imageCtrl.imageLayers._layers, function( layer ) {
+						angular.forEach( zoomerCtrl.getImageLayers()._layers, function( layer ) {
 
 							layer.on( 'click', function( e ){
 
@@ -65,7 +65,7 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 								
 									var clickedAnnotation = e.target.annotation;
 
-									var index = jQuery.inArray( clickedAnnotation, imageCtrl.annotations );
+									var index = jQuery.inArray( clickedAnnotation, zoomerCtrl.getAnnotations() );
 
 									repeaterCtrl.swipeTo( index );
 
@@ -99,12 +99,12 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 							scope.$apply( function() {
 
 			    			// Add geoJSON to annotation record in data object
-				    		var length = imageCtrl.annotations.push({
+				    		var length = zoomerCtrl.getAnnotations().push({
 					    		geoJSON: geoJSON
 					    	});
 
 				    		// Get a reference to the new annotation
-					    	var annotation = imageCtrl.annotations[ length - 1 ];
+					    	var annotation = zoomerCtrl.getAnnotations()[ length - 1 ];
 
 					    	// Convert geoJSON to layer
 					    	var layer = L.GeoJSON.geometryToLayer( geoJSON.geometry );
@@ -113,7 +113,7 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 								layer.annotation = annotation;
 
 								// Add to local image layers collection
-								imageCtrl.imageLayers.addLayer( layer );
+								zoomerCtrl.getImageLayers().addLayer( layer );
 
 								// Zoom in on image
 								zoomer.map.fitBounds( layer );
@@ -125,7 +125,7 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 									
 										var clickedAnnotation = e.target.annotation;
 
-										var index = jQuery.inArray( clickedAnnotation, imageCtrl.annotations );
+										var index = jQuery.inArray( clickedAnnotation, zoomerCtrl.getAnnotations() );
 
 										repeaterCtrl.swipeTo( index );
 
@@ -153,13 +153,13 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 
 							angular.forEach( e.layers._layers, function( layer ) {
 
-								var index = jQuery.inArray( layer.annotation, imageCtrl.annotations );
+								var index = jQuery.inArray( layer.annotation, zoomerCtrl.getAnnotations() );
 
 								badEggs.push( index );
 
 							});
 
-							angular.forEach( imageCtrl.annotations, function( annotation, index ) {
+							angular.forEach( zoomerCtrl.getAnnotations(), function( annotation, index ) {
 
 								if( -1 === jQuery.inArray( index, badEggs ) ) {
 
@@ -202,7 +202,7 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 
 								scope.$apply( function() {
 
-										imageCtrl.annotations.splice( badEgg, 1 );
+										zoomerCtrl.getAnnotations().splice( badEgg, 1 );
 									
 								});
 
@@ -231,11 +231,6 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 							});
 
 						});
-
-						/**
-						 * Go to annotation on image area click
-						 */
-						zoomer.map.on( 'draw:')
 
 					}
 				}

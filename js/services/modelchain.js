@@ -96,6 +96,27 @@ angular.module( 'griot' ).factory( 'ModelChain', function() {
 
 			return model;
 
+		},
+
+		/**
+		 * Bypass model
+		 */
+		bypassModel: function( scope ) {
+
+			scope.modelChain = angular.copy( scope.$parent.modelChain );
+
+			// Check if this directive is the child of a repeater
+			// If so, push repeater item index into model chain
+			if( typeof scope.$parent.$index !== "undefined" ) {
+				scope.modelChain.push( scope.$parent.$index );
+			}
+
+			scope.model = scope;
+
+			for( var i = 0; i < scope.modelChain.length; i++ ) {
+				scope.model = scope.model[ scope.modelChain[ i ] ];
+			}
+
 		}
 
 	}

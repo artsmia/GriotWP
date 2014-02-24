@@ -16,13 +16,47 @@ angular.module( 'griot' ).directive( 'field', function() {
 		},
 		controller: function( $scope, $element, $attrs, ModelChain ) {
 
-			ModelChain.updateModel( $scope, $attrs.name );
-
-			$scope.protected = $attrs.hasOwnProperty( 'protected' ) ? true : false;
+			$scope.protected = false;
 
 			$scope.toggleProtection = function() {
-
 				$scope.protected = ! $scope.protected;
+			}
+
+			/**
+			 * Update ModelChain, unless the template of this type of field includes
+			 * the 'bypassModel' attribute. 
+			 * 
+			 * bypassModel simply copies the model and modelChain from the parent 
+			 * scope and makes them available to child directives, without adding the
+			 * current field's name. This is useful when the field contains a 
+			 * collection of other fields. E.g. if the field's name in the markup is
+			 * 'customfield' and it's an alias for inputs with names 'A', 'B' and 'C', 
+			 * updateModel will try (and likely fail) to create this structure:
+			 *
+			 * data {
+			 *   customfield: { // Initialize this as an object or else it will fail!
+	     *     A: 'value',
+	     *     B: 'value',
+	     *     C: 'value'
+	     *   }
+	     * }
+	     *
+	     * Applying bypassModel to the main field cuts out the middle man:
+	     *
+			 * data {
+			 *   A: 'value',
+			 *   B: 'value',
+			 *   C: 'value'
+			 * }
+			 * 
+			 */
+			if( $attrs.hasOwnProperty( 'bypassmodel' ) ) {
+
+				ModelChain.bypassModel( $scope );
+
+			} else {
+
+				ModelChain.updateModel( $scope, $attrs.name );
 
 			}
 
@@ -32,6 +66,10 @@ angular.module( 'griot' ).directive( 'field', function() {
 			var fieldhtml;
 
 			switch( attrs.type ){
+
+				case 'objectselector':
+					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object.id for object in ui.objects' ng-disabled='protected'></select>";
+					break;
 
 				case 'text':
 					fieldhtml = "<input type='text' ng-model='model." + attrs.name + "' ng-disabled='protected' />";
@@ -45,8 +83,23 @@ angular.module( 'griot' ).directive( 'field', function() {
 					fieldhtml = "<textarea ng-model='model." + attrs.name + "' ck-editor ng-disabled='protected' ></textarea>";
 					break;
 
+				case 'zoomer':
+
+					attrs.bypassmodel = 'bypassmodel';
+
+					var transcrude = elem.html();
+
+					fieldhtml = "<zoomer name='" + attrs.name + "' object='" + attrs.object + "' annotations-name='" + attrs.annotationsName + "' annotations-label='" + attrs.annotationsLabel + "' annotations-label-singular='" + attrs.annotationsLabelSingular + "' annotations-label-plural='" + attrs.annotationsLabelPlural + "'>" + transcrude + "</zoomer>";
+
+					break;
+
+				case 'zoomerselector':
+
+					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object for object in ( ui.objects | filterObjects : ui : data." + attrs.object + ".id )' ng-disabled='protected'><option value=''>None</option></select>";
+					break;
+
 				case 'relationship':
-					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='record.ID as ( record | getTitle ) for record in ui.recordList[ ui.oppositeRecordType ]' multiple ng-disabled='protected' ></select>";
+					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='record.ID as ( record | getTitle ) for record in ui.recordList[ ui.oppositeRecordType ]' multiple ng-disabled='protected'></select>";
 					break;
 
 				case 'image':

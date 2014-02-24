@@ -5,26 +5,26 @@
 		<switch name='layout' label='Layout:' default='text'>
 
 			<switchgroup type='text' label='Text Content'>
-				<field label='Content' name='content' type='wysiwyg' />
+				<field type='wysiwyg' name='content' label='Content' />
 			</switchgroup>
 
 			<switchgroup type='video' label='Video'>
-				<field label='Video URL' name='video' type='text' />
-				<field label='Content' name='content' type='wysiwyg' />
-				<field label='Label' name='label' type='textarea' />
+				<field type='text' name='video' label='Video URL' />
+				<field type='wysiwyg' name='content' label='Content' />
+				<field type='textarea' name='label' label='Label' />
 			</switchgroup>
 
 			<switchgroup type='image' label='Image'>
-				<field label='Image' name='image' type='image' />
-				<field label='Content' name='content' type='wysiwyg' />
-				<field label='Label' name='label' type='textarea' />
+				<field type='zoomer' name='image' label='Image' />
+				<field type='wysiwyg' name='content' label='Content' />
+				<field type='textarea' name='label' label='Label' />
 			</switchgroup>
 
 			<switchgroup type='sidebyside' label='Side by Side'>
-				<field label='Image 1' name='image' type='image' />
-				<field label='Image 2' name='image_b' type='image' />
-				<field label='Content' name='content' type='wysiwyg' />
-				<field label='Label' name='label' type='textarea' />
+				<field type='zoomer' name='image' label='Image 1' />
+				<field type='zoomer' name='image_b' label='Image 2' />
+				<field type='wysiwyg' name='content' label='Content' />
+				<field type='textarea' name='label' label='Label' />
 			</switchgroup>
 
 		</switch>

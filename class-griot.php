@@ -358,7 +358,7 @@ class Griot{
 			);
 			wp_enqueue_script( 
 				'griot-annotatedimage',
-				plugins_url( 'js/directives/annotatedimage.js', __FILE__ ),
+				plugins_url( 'js/directives/zoomer.js', __FILE__ ),
 				'griot',
 				null,
 				true
@@ -426,6 +426,13 @@ class Griot{
 				null,
 				true
 			);
+			wp_enqueue_script(
+				'griot-filter-objects',
+				plugins_url( 'js/filters/filter-objects.js', __FILE__ ),
+				'griot',
+				null,
+				true
+			);
 
 			// WordPress media manager scripts
 			wp_enqueue_media();
@@ -467,10 +474,10 @@ class Griot{
 
 		global $post;
 
-		// Convert available image list into array
 		$imageList = explode( "\r\n", get_option( 'griot_image_list' ) );
 
-		// Construct data dump object for application
+		$tileServer = get_option( 'griot_tile_server' );
+
 		$griotData = array(
 
 			'recordType'  => $screen_id,
@@ -478,13 +485,13 @@ class Griot{
 			'title'       => $post->post_title,
 			'data'        => $post->post_content,
 			'recordList'  => get_option( 'griot_record_list' ),
-			'tilejson'    => get_option( 'griot_tilejson_base_url' ),
 			'imageSrc'    => get_option( 'griot_image_source', 'wordpress' ),
 			'imageList'   => $imageList,
+			'tileServer'  => $tileServer,
+			'config'      => $this->get_config( $tileServer ),
 
 		);
 
-		// Print to page
 		wp_localize_script(
 			'griot',
 			'griotData',
@@ -590,42 +597,56 @@ class Griot{
 	 */
 	function register_settings() {
 
-		register_setting( 'griot_settings', 'griot_tilejson_base_url', array( $this, 'sanitize_tilejson_base_url_field' ) );
+		register_setting( 'griot_settings', 'griot_tile_server', array( $this, 'sanitize_tile_server_field' ) );
 		register_setting( 'griot_settings', 'griot_image_source' );
 		register_setting( 'griot_settings', 'griot_image_list' );
 
-		add_settings_section( 'griot_image_settings', 'Image Settings', null, 'griotwp' );  
+		add_settings_section( 'griot_zoomable_image_settings', 'Zoomable Images', null, 'griotwp' );
+		add_settings_section( 'griot_static_image_settings', 'Static Images', array( $this, 'render_static_image_section' ), 'griotwp' );
 
-		add_settings_field( 'griot_tilejson_base_url', 'TileJSON Base URL', array( $this, 'render_tilejson_base_url_field' ), 'griotwp', 'griot_image_settings' );
-		add_settings_field( 'griot_image_source', 'Image Source', array( $this, 'render_image_source_field' ), 'griotwp', 'griot_image_settings' );      
-		add_settings_field( 'griot_image_list', 'Available Images', array( $this, 'render_image_list_field' ), 'griotwp', 'griot_image_settings' );      
+		add_settings_field( 'griot_tile_server', 'Tile Server', array( $this, 'render_tile_server_field' ), 'griotwp', 'griot_zoomable_image_settings' );
+		add_settings_field( 'griot_image_source', 'Image Source', array( $this, 'render_image_source_field' ), 'griotwp', 'griot_static_image_settings' );      
+		add_settings_field( 'griot_image_list', 'Available Static Images', array( $this, 'render_image_list_field' ), 'griotwp', 'griot_static_image_settings' );      
 
 	}
 
 
 	/**
-	 * Render TileJSON Base URL field
+	 * Render Static Image settings section
 	 *
 	 * @since 0.0.1
 	 */
-	function render_tilejson_base_url_field() {
+	function render_static_image_section() {
+		?>
+		<p>NOTE: Static images are not used in the default configuration of Griot (all images are zoomable). However, a static image field and related settings are provided for extensibility.</p>
+		<?php
+	}
 
-		$content = get_option( 'griot_tilejson_base_url' );
+
+	/**
+	 * Render Tile Server field
+	 *
+	 * @since 0.0.1
+	 */
+	function render_tile_server_field() {
+
+		$content = get_option( 'griot_tile_server' );
 
 		?>
 
-		<input type='text' name='griot_tilejson_base_url' value='<?php echo $content; ?>' />
+		<input type='text' name='griot_tile_server' id='griot-tile-server' value='<?php echo $content; ?>' />
+		<p id='griot-tile-server-response'></p>
 
 		<?php
 	}
 
 
 	/**
-	 * Add a trailing slash to TileJSON Base URL field if not included
+	 * Add a trailing slash to Tile Server field if not included
 	 *
 	 * @since 0.0.1
 	 */
-	function sanitize_tilejson_base_url_field( $input ) {
+	function sanitize_tile_server_field( $input ) {
 
 		$sanitized = substr( $input, -1 ) == '/' ? $input : $input . '/';
 
@@ -672,6 +693,54 @@ class Griot{
 
 
 	/**
+	 * Get config JSON from remote server
+	 *
+	 * @since 0.0.1
+	 * @param string $config_url The URL from which to retrieve the config json
+	 * @return string The config data in JSON format
+	 */
+	function get_config( $config_url ) {
+
+		$ch = curl_init( $config_url );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+		$json = curl_exec( $ch );
+		curl_close( $ch );
+
+		if( ! json_decode( $json ) ) {
+			return "ERROR: Cannot retrieve config. Please check your tile server settings.";
+		} else {
+			return $json;
+		}
+
+	}
+
+
+	/**
+	 * Check server URL entered in settings to make sure config exists and is
+	 * not malformed (AJAX callback)
+	 *
+	 * @since 0.0.1
+	 */
+	function check_config() {
+
+		$config_url = $_POST[ 'config_url' ];
+
+		$json = $this->get_config( $config_url );
+
+		$config = json_decode( $json, true );
+
+		if( $config ) {
+			echo $json;
+		} else {
+			echo 'error';
+		}
+
+		die;
+	
+	}
+
+
+	/**
 	 * Set up plugin
 	 * 
 	 * @since 0.0.1
@@ -712,6 +781,9 @@ class Griot{
 		// Add settings page and settings
 		add_action( 'admin_menu', array( $this, 'register_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+
+		// Add config callback for settings page
+		add_action( 'wp_ajax_griot_get_config', array( $this, 'check_config' ) );
  
 	}
 
