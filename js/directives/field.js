@@ -68,7 +68,7 @@ angular.module( 'griot' ).directive( 'field', function() {
 			switch( attrs.type ){
 
 				case 'objectselector':
-					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object.id for object in ui.objects' ng-disabled='protected'></select>";
+					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object.id for object in ui.objects' ng-disabled='protected'><option value=''>None</option></select>";
 					break;
 
 				case 'text':
