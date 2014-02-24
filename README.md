@@ -33,25 +33,35 @@ Install GriotWP as you would any other WordPress plugin. GriotWP can be installe
 
 1. Upload the griotwp folder to your WordPress plugins directory (/wp-content/plugins/).
 2. Log in to WordPress and activate GriotWP in the Plugins menu.
-3. Navigate to Settings > GriotWP and configure your **image settings.**
+3. Navigate to Settings > GriotWP and configure your settings.
 
-### Image Settings
+### Settings
 
-#### TileJSON Base URL
+#### Zoomable Images
 
-In order to use annotated images, you must define a **base URL** the system can query for a [TileJSON](https://github.com/mapbox/tilejson-spec) object describing the set of tiles for that image. The system expects to be able to retrieve your TileJSON object at **base_url/id.tif**, where **id** is the image ID entered on an given edit screen to specify an image to annotate.
+The **tile server** is a URL the system can query for [TileJSON](https://github.com/mapbox/tilejson-spec) objects describing the set of tiles for a given image. 
 
-#### Image Source
+Additionally, when accessing your tile server's root directory, GriotWP expects to receive a configuration JSON object linking object IDs to zoomable images. GriotWP uses this information to populate and filter user-facing lists of available objects and zoomable images.
 
-You can also attach regular static images to your content. By default, the system will use the WordPress Media Manager to upload and select images. However, this means that the Griot application will request those images from WordPress, which may have consequences for performance. As an alternative, you can enter a list of external image URLs which the system will load and make available to the author.
+#### Static Images
+
+In its default configuration, Griot does not make use of static (i.e. non-zoomable) images. However, a static image field is provided for extensibility, and the static image settings provide some control over the static image workflow.
+
+**Image source** tells the system where to look for images that can be attached to objects and stories. 
+
+If "Insert images from WordPress" is selected, GriotWP will use the standard WordPress Media Manager for uploading and selecting images. In this case, the data object returned by GriotWP will reference the image's location within the WordPress wp-content folder. Note that pulling images from WordPress may have repercussions for performance.
+
+"Add a list of available image URLs" allows the administrator to paste in a list of URLs referring to **available static images**. These images will be presented to the user as thumbnails when the image field is used.
 
 ## Endpoints
 
-Adding /griot/ to the end of your WordPress root URL will return a JSON object encompassing all published objects and stories:
+Adding /griot/ to the end of your WordPress site URL will return a JSON object encompassing all published objects and stories:
 
 `http://www.example.com/griot/`
 
-This is the object Griot will ingest to populate the application. You can also get JSON for objects or stories only: 
+This is the object that will be ingested to populate the Griot application. 
+
+Although not required in the default configuration, you can also get JSON for objects or stories only: 
 
 `http://www.example.com/griot/objects/`
 
@@ -63,33 +73,9 @@ Or for a specific record by WordPress ID:
 
 GriotWP's edit screens are modular to facilitate both small tweaks and major customizations of the application. Form templates (griotwp/templates/) are built from semantic custom tags which can be rearranged, recombined, and nested while maintaining the integrity of the returned data.
 
-### `<field>`
+### Repeaters
 
-The `<field>` tag renders a field of various types, along with related UI elements. 
-
-#### Attributes
-
-**type** _Required_ The type of field. One of: 'text', 'textarea', 'wysiwyg', 'image', or 'custom'.
-
-**name** _Required_ The unique key that will refer to the field's value in the data object.
-
-**label** _Optional_ The user-facing label for the field.
-
-**protected** _Optional_ Add an extra step to unlock the field before editing.
-
-### `<annotatedimage>`
-
-The `<annotatedimage>` tag renders a zoomable, annotatable image. Fields and control elements nested beneath the `<annotatedimage>` tag will appear in a special annotations repeater beneath the image. 
-
-#### Attributes
-
-**name** _Required_ The unique key that will refer to the user-entered image ID in the data object. (Note: the annotations repeater always has the name 'annotations'.)
-
-**label** _Optional_ The user-facing label for the image.
-
-### `<repeater>`
-
-The `<repeater>` tag allows the author to arbitrarily duplicate the set of fields nested beneath it. 
+The `<repeater>` tag allows the user to arbitrarily duplicate the set of fields nested beneath it. 
 
 #### Attributes
 
@@ -101,15 +87,17 @@ The `<repeater>` tag allows the author to arbitrarily duplicate the set of field
 
 **label-plural** _Optional_ The user-facing plural label for multiple repeater items. 
 
-### `<switch>` and `<switchgroup>`
+### Dynamic Layouts
 
-`<switch>` and `<switchgroup>` allow the user to create dynamic content layouts. `<switch>` will render a dropdown which the author can use to select which `<switchgroup>` to use as a layout. Fields in different groups with the same name refer to the same property in the data object.
+`<switch>` and `<switchgroup>` allow the user to create dynamic content layouts. `<switch>` will render a dropdown which the author can use to select which `<switchgroup>` to use as a layout. 
+
+NOTE: Fields in different groups but with the same name refer to the same property in the data object. This makes it easier to flip between groups without needing to retype content.
 
 #### Switch Attributes
 
 **name** _Required_ The unique key that will refer to the selected layout in the data object.
 
-**label** _Optional_ The user-facing label preceding the layout dropdown.
+**label** _Optional_ The user-facing label for the layout dropdown.
 
 **default** _Optional_ The type of layout that will load up with the control. 
 
@@ -118,6 +106,68 @@ The `<repeater>` tag allows the author to arbitrarily duplicate the set of field
 **type** _Required_ The unique key for the layout represented by the group.
 
 **label** _Required_ The user-facing (via the `<switch>` dropdown) label for the group.
+
+### Fields
+
+The `<field>` tag renders a field of a given type, along with related UI elements. 
+
+#### Field Attributes
+
+**type** _Required_ The type of field.
+
+**name** _Required_ The unique key that will refer to the field's value in the data object.
+
+**label** _Optional_ The user-facing label for the field.
+
+**protected** _Optional_ Forces the user to unlock the field before editing to prevent accidental changes.
+
+#### Included Field Types
+
+_image_
+
+A static image.
+
+_objectselector_
+
+Dropdown of available object IDs. Note: This field does not list the WordPress IDs of object posts, but rather the (user-defined) IDs assigned to objects in the tile server config.
+
+_relationship_
+
+Multi-select field of currently published stories, used for creating links from one object to many stories.
+
+_text_
+
+Simple text field.
+
+_textarea_
+
+Simple textarea field.
+
+_wysiwyg_
+
+Stripped-down CKEditor text editor.
+
+_zoomer_
+
+An image zoomer with optional annotations. To enable the annotations repeater, simply nest additional fields within the zoomer. 
+
+_zoomerselector_
+
+Dropdown of zoomable images filtered by the selected object. The zoomerselector inherits the **object** attribute of its parent zoomer. It can also be used separately as a generic zoomable image selector. To filter by an object in this case, simply define the **object** attribute on the zoomerselector.
+
+#### Additional Zoomer Field Attributes
+
+Zoomer fields have some special attributes:
+
+**object** _Optional_ The **name** attribute of an `<objectselector>` field whose current value should be used to filter the list of zoomable images. This is passed to a zoomerselector embedded within the zoomer field.
+
+**annotations-name** _Required for annotations_ The unique key that will refer to the array of annotations in the data object.
+
+**annotations-label** _Optional_ The user-facing label for the annotations.
+
+**annotations-label-singular** _Optional_ The user-facing singular label for a single annotation.
+
+**annotations-label-plural** _Optional_ The user-facing plural label for multiple annotations.
 
 ### License (MIT)
 

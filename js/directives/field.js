@@ -106,10 +106,6 @@ angular.module( 'griot' ).directive( 'field', function() {
 					fieldhtml = "<imagepicker name='" + attrs.name + "' />";
 					break;
 
-				case 'custom':
-					fieldhtml = elem.contents();
-					break;
-
 			}
 
 			var templatehtml = "<div class='griot-field-wrap' ng-class='{ \"griot-protected\": protected}' data='data' ui='ui' >" +
