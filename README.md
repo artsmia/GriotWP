@@ -1,20 +1,8 @@
 # GriotWP
 
-GriotWP provides a simple and extensible back end for the Minneapolis Institute of Arts' open-source iPad presentation software, Griot.
+GriotWP provides a simple and extensible back end for the Minneapolis Institute of Arts' open-source iPad presentation software, [Griot](https://github.com/artsmia/griot).
 
 ## Description
-
-### About Griot for iPad
-
-Griot is an open-source iPad application that facilitates engagement with a collection of **objects** (artifacts, artwork, graphs, or anything else that can be represented visually) through **annotations** (points of interest on the object itself) and **stories** (related text-based and multimedia content, presented as a series of pages).
-
-The Griot framework requires three components:
-
-1. The Griot software itself;
-2. A server for creating and serving tiled images; and
-3. An interface (such as GriotWP) for loading content and bundling it in JSON format.
-
-### About GriotWP
 
 GriotWP is a free WordPress plugin that enables any user to load content into the Griot application.
 
