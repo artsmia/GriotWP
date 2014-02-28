@@ -2,29 +2,29 @@
 
 	<repeater label='Pages' name='pages' label-singular='page' label-plural='pages'>
 
-		<switch name='layout' label='Layout:' default='text'>
+		<switch name='type' label='Layout:' default='text'>
 
 			<switchgroup type='text' label='Text Content'>
-				<field type='wysiwyg' name='content' label='Content' />
+				<field type='wysiwyg' name='text' label='Content' />
 			</switchgroup>
 
 			<switchgroup type='video' label='Video'>
 				<field type='text' name='video' label='Video URL' />
-				<field type='wysiwyg' name='content' label='Content' />
-				<field type='textarea' name='label' label='Label' />
+				<field type='wysiwyg' name='text' label='Content' />
+				<field type='textarea' name='credit' label='Credit Line' />
 			</switchgroup>
 
 			<switchgroup type='image' label='Image'>
 				<field type='zoomer' name='image' label='Image' />
-				<field type='wysiwyg' name='content' label='Content' />
-				<field type='textarea' name='label' label='Label' />
+				<field type='wysiwyg' name='text' label='Content' />
+				<field type='textarea' name='credit' label='Credit Line' />
 			</switchgroup>
 
-			<switchgroup type='sidebyside' label='Side by Side'>
+			<switchgroup type='comparison' label='Side by Side'>
 				<field type='zoomer' name='image' label='Image 1' />
-				<field type='zoomer' name='image_b' label='Image 2' />
-				<field type='wysiwyg' name='content' label='Content' />
-				<field type='textarea' name='label' label='Label' />
+				<field type='zoomer' name='imageB' label='Image 2' />
+				<field type='wysiwyg' name='text' label='Content' />
+				<field type='textarea' name='credit' label='Credit Line' />
 			</switchgroup>
 
 		</switch>

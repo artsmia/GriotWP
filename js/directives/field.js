@@ -68,7 +68,7 @@ angular.module( 'griot' ).directive( 'field', function() {
 			switch( attrs.type ){
 
 				case 'objectselector':
-					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object.id for object in ui.objects' ng-disabled='protected'><option value=''>None</option></select>";
+					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object for object in ui.objects' ng-disabled='protected'><option value=''>None</option></select>";
 					break;
 
 				case 'text':
@@ -94,8 +94,7 @@ angular.module( 'griot' ).directive( 'field', function() {
 					break;
 
 				case 'zoomerselector':
-
-					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object for object in ( ui.objects | filterObjects : ui : data." + attrs.object + ".id )' ng-disabled='protected'><option value=''>None</option></select>";
+					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object for object in ( ui.objects | filterObjects : ui : data." + attrs.object + " )' ng-disabled='protected'><option value=''>None</option></select>";
 					break;
 
 				case 'relationship':

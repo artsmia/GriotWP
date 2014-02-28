@@ -14,20 +14,17 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, ModelChain 
 		oppositeRecordType: griotData.recordType == 'object' ? 'story' : 'object',
 		recordList: griotData.recordList,
 		tileServer: griotData.tileServer,
-		zoomables: griotData.config.all,
+		zoomables: griotData.config,
 		objects: []
 	}
-	
+
 	for( var objectid in griotData.config.grouped ) {
 
 		if( 'null' === objectid || '_empty_' === objectid ) {
 			continue;
 		}
 
-		$scope.ui.objects.push({
-			'id':objectid,
-			'zoomables':griotData.config.grouped[ objectid ]
-		});
+		$scope.ui.objects.push( objectid );
 
 	}
 

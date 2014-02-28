@@ -1,10 +1,10 @@
 <div>
 
-	<field type='objectselector' label='Object' name='object_id' protected />
+	<field type='objectselector' label='Object' name='id' protected />
 
 	<repeater name='views' label='Views' label-singular='view' label-plural='views'>
 
-		<field type='zoomer' name='image' object='object_id' annotations-name='customname' annotations-label='Annotations' annotations-label-singular='annotation' annotations-label-plural='annotations'>
+		<field type='zoomer' name='image' object='id' annotations-name='annotations' annotations-label='Annotations' annotations-label-singular='annotation' annotations-label-plural='annotations'>
 
 			<!-- annotations -->
 
@@ -14,7 +14,7 @@
 
 			<repeater name='attachments' label='Attachments' label-singular='attachment' label-plural='attachments'>
 
-				<field type='image' name='image' />
+				<field type='zoomer' name='image_id' label='Image' object='id' />
 
 			</repeater>
 

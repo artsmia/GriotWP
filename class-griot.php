@@ -536,7 +536,7 @@ class Griot{
 	 */
 	function related_records_metabox_template() {
 
-		echo "<field name='related' type='relationship' />";
+		echo "<field name='relatedStories' type='relationship' />";
 
 	}
 
