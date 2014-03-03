@@ -768,8 +768,6 @@ class Griot{
 
 		// Rebuild record list when post structure changes
 		add_action( 'save_post', array( $this, 'build_record_list' ) );
-		add_action( 'trashed_post', array( $this, 'build_record_list' ) );
-		add_action( 'untrashed_post', array( $this, 'build_record_list' ) );
 		add_action( 'deleted_post', array( $this, 'build_record_list' ) );
 
 		// If this page is managed by the plugin, enqueue scripts and styles
