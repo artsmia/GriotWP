@@ -8,11 +8,18 @@ angular.module( 'griot' ).filter( 'filterObjects', function() {
 
   return function( objects, ui, requestedID ) {
 
-  	if( requestedID ) {
-  		return ui.zoomables.grouped[ requestedID ];
-  	} else {
-  		return ui.zoomables.all;
-  	}
+  	if( ui.zoomables ) {
+
+	  	if( requestedID ) {
+	  		return ui.zoomables.grouped[ requestedID ];
+	  	} else {
+	  		return ui.zoomables.all;
+	  	}
+
+	  }
+	  else {
+	  	console.log( 'WARNING: No config detected!' );
+	  }
 
   };
 

@@ -18,14 +18,21 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, ModelChain 
 		objects: []
 	}
 
-	for( var objectid in griotData.config.grouped ) {
+	if( griotData.config ) {
 
-		if( 'null' === objectid || '_empty_' === objectid ) {
-			continue;
+		for( var objectid in griotData.config.grouped ) {
+
+			if( 'null' === objectid || '_empty_' === objectid ) {
+				continue;
+			}
+
+			$scope.ui.objects.push( objectid );
+
 		}
 
-		$scope.ui.objects.push( objectid );
-
+	}
+	else {
+		console.log( 'WARNING: No config detected!' );
 	}
 
 	// Initialize model chain
