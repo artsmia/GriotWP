@@ -17,7 +17,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 			var templateHtml = "<div class='griot-annotated-image'>" +
 				"<field type='zoomerselector' object='" + attrs.object + "' name='" + attrs.name + "' />" +
-				"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$parent.$index || 0}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations }' />";
+				"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$id}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations }' />";
 
 			if( transcrude ) {
 
@@ -66,7 +66,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 					_this.buildZoomer( tileData );
 
 				});
-				http.error( function() {
+				http.error( function( e ) {
 
 					_this.destroyZoomer();
 
@@ -91,6 +91,8 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				// NOTE: Can't get it on init, because the {{index}} component will 
 				// not have been interpolated by Angular yet
 				$scope.container_id = $element.find( '.griot-zoomer' ).first().attr( 'id' );
+
+				console.log( $scope.container_id );
 
 				// Build zoomer and store instance in scope
 				$scope.zoomer = Zoomer.zoom_image({
