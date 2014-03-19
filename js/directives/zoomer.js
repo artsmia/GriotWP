@@ -92,8 +92,6 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				// not have been interpolated by Angular yet
 				$scope.container_id = $element.find( '.griot-zoomer' ).first().attr( 'id' );
 
-				console.log( $scope.container_id );
-
 				// Build zoomer and store instance in scope
 				$scope.zoomer = Zoomer.zoom_image({
 					container: $scope.container_id,
