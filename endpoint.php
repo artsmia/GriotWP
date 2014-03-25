@@ -1,7 +1,8 @@
 <?php
 
-global $wpdb;
+header( 'Access-Control-Allow-Origin: *' );
 
+global $wpdb;
 
 // Get data
 $posts = $wpdb->get_results( 
