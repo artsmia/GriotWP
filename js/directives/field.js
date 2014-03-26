@@ -16,6 +16,9 @@ angular.module( 'griot' ).directive( 'field', function() {
 		},
 		controller: function( $scope, $element, $attrs, ModelChain ) {
 
+			$scope.griotData = griotData;
+			console.log( $scope.griotData );
+
 			$scope.protected = false;
 
 			$scope.toggleProtection = function() {
@@ -107,7 +110,7 @@ angular.module( 'griot' ).directive( 'field', function() {
 
 			}
 
-			var templatehtml = "<div class='griot-field-wrap' ng-class='{ \"griot-protected\": protected }' data='data' ui='ui' ng-hide='typeof( attrs.hidden ) !== \"undefined\"'>" +
+			var templatehtml = "<div class='griot-field-wrap' ng-class='{ \"griot-protected\": protected }' data='data' ui='ui' ng-hide='attrs.hidden'>" +
 				"<div class='griot-field-meta'>";
 
 			// Add label if specified
@@ -133,6 +136,18 @@ angular.module( 'griot' ).directive( 'field', function() {
 
 			return templatehtml;
 
+		},
+		link: function( scope, elem, attrs ) {
+
+			if( 'undefined' !== typeof( attrs.autofill ) ) {
+
+				try{
+					scope.model[ attrs.name ] = scope.$eval( attrs.autofill );
+				} catch( e ) {
+					console.log( 'Autofill error on ' + attrs.name + ':' + e );
+				}
+
+			}
 		}
 
 	};

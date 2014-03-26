@@ -482,6 +482,7 @@ class Griot{
 
 			'recordType'  => $screen_id,
 			'templateUrl' => $this->templates[ $screen_id ],
+			'postID'      => $post->ID,
 			'title'       => $post->post_title,
 			'data'        => $post->post_content,
 			'recordList'  => get_option( 'griot_record_list' ),
