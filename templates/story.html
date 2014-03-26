@@ -3,6 +3,8 @@
 	<field hidden type='text' name='id' autofill='griotData.postID' />
 	<field hidden type='text' name='recordtype' autofill='griotData.recordType' />
 
+	<field type='image' name='thumbnail' label='Optional Thumbnail' />
+
 	<repeater label='Pages' name='pages' label-singular='page' label-plural='pages'>
 
 		<switch name='type' label='Layout:' default='text'>
@@ -31,8 +33,6 @@
 			</switchgroup>
 
 		</switch>
-
-		<field type='image' name='thumbnail' label='Optional Thumbnail' />
 
 	</repeater>
 
