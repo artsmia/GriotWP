@@ -107,7 +107,7 @@ angular.module( 'griot' ).directive( 'field', function() {
 
 			}
 
-			var templatehtml = "<div class='griot-field-wrap' ng-class='{ \"griot-protected\": protected}' data='data' ui='ui' >" +
+			var templatehtml = "<div class='griot-field-wrap' ng-class='{ \"griot-protected\": protected }' data='data' ui='ui' ng-hide='typeof( attrs.hidden ) !== \"undefined\"'>" +
 				"<div class='griot-field-meta'>";
 
 			// Add label if specified
