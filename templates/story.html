@@ -2,6 +2,7 @@
 
 	<repeater label='Pages' name='pages' label-singular='page' label-plural='pages'>
 
+
 		<switch name='type' label='Layout:' default='text'>
 
 			<switchgroup type='text' label='Text Content'>
@@ -9,7 +10,6 @@
 			</switchgroup>
 
 			<switchgroup type='video' label='Video'>
-				<field type='image' name='thumbnail' label='Video Thumbnail' />
 				<field type='text' name='video' label='Video URL' />
 				<field type='wysiwyg' name='text' label='Content' />
 				<field type='textarea' name='credit' label='Credit Line' />
@@ -29,6 +29,8 @@
 			</switchgroup>
 
 		</switch>
+
+		<field type='image' name='thumbnail' label='Optional Thumbnail' />
 
 	</repeater>
 
