@@ -3,7 +3,7 @@
 	<field hidden type='text' name='id' autofill='griotData.postID' />
 	<field hidden type='text' name='recordtype' autofill='griotData.recordType' />
 
-	<field type='image' name='thumbnail' label='Optional Thumbnail' />
+	<field type='image' name='thumbnail' label='Thumbnail (optional)' />
 
 	<repeater label='Pages' name='pages' label-singular='page' label-plural='pages'>
 
@@ -15,21 +15,22 @@
 
 			<switchgroup type='video' label='Video'>
 				<field type='text' name='video' label='Video URL' />
+				<field type='textarea' name='meta' label='Video Metadata' />
 				<field type='wysiwyg' name='text' label='Content' />
-				<field type='textarea' name='credit' label='Credit Line' />
 			</switchgroup>
 
 			<switchgroup type='image' label='Image'>
 				<field type='zoomer' name='image' label='Image' />
+				<field type='textarea' name='meta' label='Image Metadata' />
 				<field type='wysiwyg' name='text' label='Content' />
-				<field type='textarea' name='credit' label='Credit Line' />
 			</switchgroup>
 
 			<switchgroup type='comparison' label='Side by Side'>
 				<field type='zoomer' name='image' label='Image 1' />
+				<field type='textarea' name='meta' label='Image 1 Metadata' />
 				<field type='zoomer' name='imageB' label='Image 2' />
+				<field type='textarea' name='metaB' label='Image 2 Metadata' />
 				<field type='wysiwyg' name='text' label='Content' />
-				<field type='textarea' name='credit' label='Credit Line' />
 			</switchgroup>
 
 		</switch>
