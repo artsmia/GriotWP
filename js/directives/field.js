@@ -17,7 +17,6 @@ angular.module( 'griot' ).directive( 'field', function() {
 		controller: function( $scope, $element, $attrs, ModelChain ) {
 
 			$scope.griotData = griotData;
-			console.log( $scope.griotData );
 
 			$scope.protected = false;
 
