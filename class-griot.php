@@ -357,6 +357,13 @@ class Griot{
 				true
 			);
 			wp_enqueue_script( 
+				'griot-parseint',
+				plugins_url( 'js/filters/parseInt.js', __FILE__ ),
+				'griot',
+				null,
+				true
+			);
+			wp_enqueue_script( 
 				'griot-annotatedimage',
 				plugins_url( 'js/directives/zoomer.js', __FILE__ ),
 				'griot',

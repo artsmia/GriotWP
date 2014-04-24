@@ -101,7 +101,7 @@ angular.module( 'griot' ).directive( 'field', function() {
 					break;
 
 				case 'relationship':
-					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='record.ID as ( record | getTitle ) for record in ui.recordList[ ui.oppositeRecordType ]' multiple ng-disabled='protected'></select>";
+					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='( record.ID | parseInt ) as ( record | getTitle ) for record in ui.recordList[ ui.oppositeRecordType ]' multiple ng-disabled='protected' ></select>";
 					break;
 
 				case 'image':
