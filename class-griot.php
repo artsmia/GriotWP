@@ -543,9 +543,13 @@ class Griot{
 	 * @since 0.0.1
 	 */
 	function related_records_metabox_template() {
+		?>
 
-		echo "<field name='relatedStories' type='relationship' />";
+		<p>Select stories related to this object.</p>
+		<p><em>CTRL+click to select multiple stories;<br />SHIFT+click to select a range.</em></p>
+		<field name='relatedStories' type='relationship' />
 
+		<?php
 	}
 
 
