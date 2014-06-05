@@ -20,7 +20,7 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, ModelChain 
 
 	if( griotData.config ) {
 
-		for( var objectid in griotData.config.grouped ) {
+		for( var objectid in griotData.config.objects ) {
 
 			if( 'null' === objectid || '_empty_' === objectid ) {
 				continue;

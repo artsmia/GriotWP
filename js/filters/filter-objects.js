@@ -11,7 +11,7 @@ angular.module( 'griot' ).filter( 'filterObjects', function() {
   	if( ui.zoomables ) {
 
 	  	if( requestedID ) {
-	  		return ui.zoomables.grouped[ requestedID ];
+	  		return ui.zoomables.objects[ requestedID ];
 	  	} else {
 	  		return ui.zoomables.all;
 	  	}
