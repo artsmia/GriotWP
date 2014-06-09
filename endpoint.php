@@ -6,16 +6,17 @@ global $wpdb;
 
 // Get data
 $posts = $wpdb->get_results( 
-	"SELECT ID, post_type, post_content 
+	"SELECT ID, post_title, post_type, post_content 
 		FROM $wpdb->posts 
 		WHERE post_status = 'publish' 
-		AND ( post_type = 'object' OR post_type = 'story' )", 
+		AND ( post_type = 'object' OR post_type = 'story' OR post_type = 'panel' )", 
 	OBJECT 
 );
 
 $manifest = array(
 	'objects' => array(),
 	'stories' => array(),
+	'panels' => array(),
 );
 
 foreach( $posts as $post ) {
@@ -24,6 +25,11 @@ foreach( $posts as $post ) {
 
 		// Objects are keyed to user-defined object IDs, rather than WP ID
 		$object_json = json_decode( $post->post_content, true );
+
+		if( ! array_key_exists( 'id', $object_json ) ){
+			continue;
+		}
+		
 		$object_id = $object_json[ 'id' ];
 		$manifest['objects'][ $object_id ] = $object_json;
 
@@ -31,6 +37,13 @@ foreach( $posts as $post ) {
 
 	if( 'story' == $post->post_type ) {
 		$manifest['stories'][ $post->ID ] = json_decode( $post->post_content, true );
+	}
+
+	if( 'panel' == $post->post_type ) {
+		$manifest['panels'][ $post->ID ] = array(
+			'title' => $post->post_title,
+			'content' => $post->post_content,
+		);
 	}
 
 }
@@ -46,13 +59,13 @@ if( 0 == count( $query_arr ) ) {
 	$request = 'all';
 
 }
-else if( ! in_array( $query_arr[0], array( 'objects', 'stories' ) ) ) {
+else if( ! in_array( $query_arr[0], array( 'objects', 'stories', 'panels' ) ) ) {
 
 	// Malformed
 	$request = 'all';
 
 }
-else if( 1 == count( $query_arr ) && in_array( $query_arr[0], array( 'objects', 'stories' ) ) ) {
+else if( 1 == count( $query_arr ) ) {
 
 	// e.g. '/griot/objects/'
 	$request = 'group';
