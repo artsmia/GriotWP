@@ -107,6 +107,28 @@ angular.module( 'griot' ).directive( 'field', function() {
 					fieldhtml = "<imagepicker name='" + attrs.name + "' />";
 					break;
 
+				case 'select':
+					/**
+					 * Angular really, really doesn't like non-dynamic selects, but we
+					 * still want the model management, so we have to convert our static
+					 * select into a dynamic one. Here (in the template) we grab the
+					 * object elements, convert them to JSON, and store them in an
+					 * element attribute. When linking, we'll read the JSON from the
+					 * attributes and construct an array in scope to read options from.
+					 */
+					var tempFieldOptions = [];
+					$options = jQuery( elem ).find( 'option' );
+					$options.each( function( i, option ) {
+						tempFieldOptions.push({
+							value: jQuery( option ).val(),
+							label: jQuery( option ).text(),
+							selected: jQuery( option ).prop( 'selected' )
+						});
+					});
+					attrs[ 'jsonFieldOptions' ] = angular.toJson( tempFieldOptions );
+					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='option.value as option.label for option in fieldOptions'></select>";
+					break;
+
 			}
 
 			var templatehtml = "<div class='griot-field-wrap' ng-class='{ \"griot-protected\": protected }' data='data' ui='ui' ng-hide='attrs.hidden'>" +
@@ -146,6 +168,25 @@ angular.module( 'griot' ).directive( 'field', function() {
 					console.log( 'Autofill error on ' + attrs.name + ':' + e );
 				}
 
+			}
+
+			switch( attrs.type ) {
+
+				case 'select':
+
+					// See select field in template function above
+					scope.fieldOptions = angular.fromJson( attrs.jsonFieldOptions );
+
+					// Set default
+					if( ! scope.model[ attrs.name ] ) {
+						angular.forEach( scope.fieldOptions, function( option ) {
+							if( option.selected ){
+								scope.model[ attrs.name ] = option.value;
+							}
+						});
+					}
+					
+					break;
 			}
 		}
 
