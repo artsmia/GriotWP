@@ -58,7 +58,7 @@ class Griot{
 			'label'               => __( 'object', 'griot' ),
 			'description'         => __( 'Represents a primary record in the application.', 'griot' ),
 			'labels'              => $labels,
-			'supports'            => array( 'title', ),
+			'supports'            => array( 'title', 'revisions' ),
 			'hierarchical'        => false,
 			'public'              => true,
 			'show_ui'             => true,
@@ -116,7 +116,7 @@ class Griot{
 			'label'               => __( 'story', 'griot' ),
 			'description'         => __( 'Represents secondary media related to a primary record in the application.', 'griot' ),
 			'labels'              => $labels,
-			'supports'            => array( 'title', ),
+			'supports'            => array( 'title', 'revisions' ),
 			'hierarchical'        => false,
 			'public'              => true,
 			'show_ui'             => true,
@@ -134,6 +134,65 @@ class Griot{
 		);
 
 		register_post_type( 'story', $args );
+
+	}
+
+
+	/**
+	 * Register Panel custom post type.
+	 *
+	 * @since 0.0.1
+	 */
+	function register_panel_cpt() {
+
+		global $wp_version;
+		$icon = $wp_version >= 3.8 ? 'dashicons-screenoptions' : null;
+
+		$labels = array(
+			'name'                => _x( 'Panels', 'Post Type General Name', 'griot' ),
+			'singular_name'       => _x( 'Panel', 'Post Type Singular Name', 'griot' ),
+			'menu_name'           => _x( 'Panels', 'Post Type Menu Name', 'griot' ),
+			'parent_item_colon'   => __( 'Parent Panel:', 'griot' ),
+			'all_items'           => __( 'All Panels', 'griot' ),
+			'view_item'           => __( 'View Panel', 'griot' ),
+			'add_new_item'        => __( 'Add New Panel', 'griot' ),
+			'add_new'             => __( 'Add New', 'griot' ),
+			'edit_item'           => __( 'Edit Panel', 'griot' ),
+			'update_item'         => __( 'Update Panel', 'griot' ),
+			'search_items'        => __( 'Search Panels', 'griot' ),
+			'not_found'           => __( 'Not found', 'griot' ),
+			'not_found_in_trash'  => __( 'Not found in Trash', 'griot' ),
+		);
+
+		$rewrite = array(
+			'slug'                => _x( 'panels', 'URL Slug', 'griot' ),
+			'with_front'          => false,
+			'feeds'               => true,
+			'pages'               => false,
+		);
+
+		$args = array(
+			'label'               => __( 'panel', 'griot' ),
+			'description'         => __( 'Represents a static panel on the cover of the application.', 'griot' ),
+			'labels'              => $labels,
+			'supports'            => array( 'title', 'editor', 'revisions' ),
+			'hierarchical'        => false,
+			'public'              => true,
+			'show_ui'             => true,
+			'show_in_menu'        => true,
+			'show_in_nav_menus'   => false,
+			'show_in_admin_bar'   => true,
+			'menu_position'       => 5,
+			'menu_icon'           => $icon,
+			'can_export'          => true,
+			'has_archive'         => true,
+			'exclude_from_search' => true,
+			'publicly_queryable'  => true,
+			'capability_type'     => 'post',
+			'rewrite'             => $rewrite,
+		);
+
+		register_post_type( 'panel', $args );
 
 	}
 
@@ -773,6 +832,7 @@ class Griot{
 		// Register Object and Story post types
 		add_action( 'init', array( $this, 'register_object_cpt' ) );
 		add_action( 'init', array( $this, 'register_story_cpt' ) );
+		add_action( 'init', array( $this, 'register_panel_cpt' ) );
 
 		// Register endpoint
 		add_action( 'init', array( $this, 'register_endpoint' ) );
