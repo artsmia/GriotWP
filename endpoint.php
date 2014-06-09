@@ -26,7 +26,7 @@ foreach( $posts as $post ) {
 		// Objects are keyed to user-defined object IDs, rather than WP ID
 		$object_json = json_decode( $post->post_content, true );
 
-		if( ! array_key_exists( 'id', $object_json ) ){
+		if( ! $object_json || ! array_key_exists( 'id', $object_json ) ){
 			continue;
 		}
 		
