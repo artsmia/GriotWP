@@ -13,7 +13,7 @@
 .griot-field-wrap{
 	margin-top:20px;
 }
-.griot-field input,
+.griot-field input[type='text'],
 .griot-field textarea,
 .griot-field select{
 	display:block;

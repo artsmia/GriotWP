@@ -129,6 +129,10 @@ angular.module( 'griot' ).directive( 'field', function() {
 					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='option.value as option.label for option in fieldOptions'></select>";
 					break;
 
+				case 'checkbox':
+					fieldhtml = "<input type='checkbox' ng-model='model." + attrs.name + "' />";
+					break;
+
 			}
 
 			var templatehtml = "<div class='griot-field-wrap' ng-class='{ \"griot-protected\": protected }' data='data' ui='ui' ng-hide='attrs.hidden'>" +
@@ -185,7 +189,7 @@ angular.module( 'griot' ).directive( 'field', function() {
 							}
 						});
 					}
-					
+
 					break;
 			}
 		}
