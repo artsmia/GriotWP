@@ -20,6 +20,7 @@ include( 'class-griot.php' );
 $templates = array(
 	'object'  =>   plugins_url( 'templates/object.html', __FILE__ ),
 	'story'   =>   plugins_url( 'templates/story.html', __FILE__ ),
+	'panel'   =>   plugins_url( 'templates/panel.html', __FILE__ ),
 );
 
 $Griot = new Griot( $templates );

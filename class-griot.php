@@ -175,7 +175,7 @@ class Griot{
 			'label'               => __( 'panel', 'griot' ),
 			'description'         => __( 'Represents a static panel on the cover of the application.', 'griot' ),
 			'labels'              => $labels,
-			'supports'            => array( 'title', 'editor', 'revisions' ),
+			'supports'            => array( 'title', 'revisions' ),
 			'hierarchical'        => false,
 			'public'              => true,
 			'show_ui'             => true,
@@ -283,7 +283,7 @@ class Griot{
 		}
 
 		// Editing screens managed by GriotWP
-		$edit_screens = array( 'object', 'story' );
+		$edit_screens = array( 'object', 'story', 'panel' );
 		if( in_array( $screen->id, $edit_screens ) ) {
 
 			// Angular

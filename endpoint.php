@@ -6,7 +6,7 @@ global $wpdb;
 
 // Get data
 $posts = $wpdb->get_results( 
-	"SELECT ID, post_title, post_type, post_content 
+	"SELECT ID, post_type, post_content 
 		FROM $wpdb->posts 
 		WHERE post_status = 'publish' 
 		AND ( post_type = 'object' OR post_type = 'story' OR post_type = 'panel' )", 
@@ -40,10 +40,7 @@ foreach( $posts as $post ) {
 	}
 
 	if( 'panel' == $post->post_type ) {
-		$manifest['panels'][ $post->ID ] = array(
-			'title' => $post->post_title,
-			'content' => $post->post_content,
-		);
+		$manifest['panels'][ $post->ID ] = json_decode( $post->post_content, true );
 	}
 
 }
