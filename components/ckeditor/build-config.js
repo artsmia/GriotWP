@@ -13,10 +13,10 @@
  * (1) http://ckeditor.com/builder
  *     Visit online builder to build CKEditor from scratch.
  *
- * (2) http://ckeditor.com/builder/81df3fb1832e5694c0a9823e15c60157
+ * (2) http://ckeditor.com/builder/2a08b96aa144b27352362cf61c33658c
  *     Visit online builder to build CKEditor, starting with the same setup as before.
  *
- * (3) http://ckeditor.com/builder/download/81df3fb1832e5694c0a9823e15c60157
+ * (3) http://ckeditor.com/builder/download/2a08b96aa144b27352362cf61c33658c
  *     Straight download link to the latest version of CKEditor (Optimized) with the same setup as before.
  *
  * NOTE:
@@ -35,15 +35,19 @@ var CKBUILDER_CONFIG = {
 		'.mailmap'
 	],
 	plugins : {
+		'about' : 1,
 		'basicstyles' : 1,
-		'horizontalrule' : 1,
+		'clipboard' : 1,
+		'enterkey' : 1,
+		'entities' : 1,
+		'floatingspace' : 1,
 		'indentlist' : 1,
+		'link' : 1,
 		'list' : 1,
-		'pastefromword' : 1,
-		'specialchar' : 1,
+		'sourcearea' : 1,
+		'sourcedialog' : 1,
 		'toolbar' : 1,
 		'undo' : 1,
-		'wordcount' : 1,
 		'wysiwygarea' : 1
 	},
 	languages : {
