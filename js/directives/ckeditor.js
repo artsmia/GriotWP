@@ -26,6 +26,9 @@ angular.module( 'griot' ).directive( 'ckEditor', function() {
         allowedContent: {
           img: {
             attributes: [ '!src', 'alt', 'width', 'height', 'style' ]
+          },
+          p: {
+            attributes: [ 'style' ]
           }
         }
       });
