@@ -62,8 +62,13 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				var http = $http.get( $scope.tilejson );
 				http.success( function( tileData ) { 
 
+					$scope.tileData = tileData;
+
+					// Hard destroy
 					_this.destroyZoomer( true );
-					_this.setupZoomer( tileData );
+
+					// Setup and build
+					_this.setupZoomer( true );
 
 				});
 				http.error( function( e ) {
@@ -78,27 +83,34 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			/**
 			 * Build zoomer
 			 */
-			this.setupZoomer = function( tileData ) {
+			this.setupZoomer = function( buildZoomer ) {
 
-				$scope.tileData = tileData;
+				if( 'undefined' === typeof buildZoomer ){
+					buildZoomer = false;
+				}
 
 				$scope.imageID = $scope.model[ $attrs.name ];
 
-
 				// Necessary?
-				$scope.tilesURL = tileData.tiles[0].replace( 'http://0', '//0' );
+				$scope.tilesURL = $scope.tileData.tiles[0].replace( 'http://0', '//0' );
 
 				// Get container ID
 				// NOTE: Can't get it on init, because the {{index}} component will 
 				// not have been interpolated by Angular yet
 				$scope.container_id = $element.find( '.griot-zoomer' ).first().attr( 'id' );
 
+				if( buildZoomer ){
+					if( $scope.isVisible() ){
+						$scope.buildZoomer();
+					}
+				}
+
 			};
 
 			$scope.buildZoomer = function(){
 
 				$scope.imageLayers = L.featureGroup();
-				
+
 				// Build zoomer and store instance in scope
 				$scope.zoomer = Zoomer.zoom_image({
 					container: $scope.container_id,
@@ -126,11 +138,14 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 			/**
 			 * Destroy zoomer
+			 *
+			 * If 'destroyData' is false, the zoomer object and map are destroyed, but
+			 * the data in the model is unaffected.
 			 */
-			this.destroyZoomer = $scope.destroyZoomer = function( destructive ) {
+			this.destroyZoomer = $scope.destroyZoomer = function( destroyData ) {
 
-				if( 'undefined' === typeof destructive ){
-					destructive = false;
+				if( 'undefined' === typeof destroyData ){
+					destroyData = false;
 				}
 
 				if( ! $scope.zoomer ) {
@@ -141,13 +156,14 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				delete $scope.zoomer;
 				delete Zoomer.zoomers[ $scope.container_id ];
 				
-				if( destructive ){
-					$timeout( function() {
-						$element.find( '.griot-zoomer' ).empty();
-						$scope.imageID = null;
-						$scope.imageLayers = null;
-						$scope.model[ 'annotations' ] = [];
-					});
+				if( destroyData ){
+					$element.find( '.griot-zoomer' ).empty();
+					$scope.imageID = null;
+					$scope.model[ 'annotations' ] = [];
+
+					// Unnecessary and throws an error on image ID change.
+					// watchForExternalDeletion will take care of removing image layers.
+					//$scope.imageLayers = null;
 				}
 
 			}
@@ -220,7 +236,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 					},
 					function() {
 
-						if( ! $scope.zoomer ) {
+						if( 'undefined' === typeof $scope.zoomer ) {
 							return;
 						}
 
@@ -302,10 +318,13 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			// Get reference to image id
 			scope.imageID = scope.model[ attrs.name ];
 
-			// Initialize
+			// Set up zoomers
 			scope.checkForTiles();
 
+			// Destroy and rebuild if ID changes
+			// TODO: Need to call buildZoomer somehow, after tiles loaded
 			elem.find( 'select' ).on( 'change', function() {
+				console.log('changed');
 				scope.checkForTiles();
 			});
 
