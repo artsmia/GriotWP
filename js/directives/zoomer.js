@@ -51,7 +51,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				// Return if image ID is blank
 				if( ! newImageID ) { 
-					_this.destroyZoomer();
+					_this.destroyZoomer( true );
 					return;
 				}
 
@@ -62,13 +62,13 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				var http = $http.get( $scope.tilejson );
 				http.success( function( tileData ) { 
 
-					_this.destroyZoomer();
-					_this.buildZoomer( tileData );
+					_this.destroyZoomer( true );
+					_this.setupZoomer( tileData );
 
 				});
 				http.error( function( e ) {
 
-					_this.destroyZoomer();
+					_this.destroyZoomer( true );
 
 				});
 
@@ -78,26 +78,33 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			/**
 			 * Build zoomer
 			 */
-			this.buildZoomer = function( tileData ) {
+			this.setupZoomer = function( tileData ) {
+
+				$scope.tileData = tileData;
 
 				$scope.imageID = $scope.model[ $attrs.name ];
 
-				$scope.imageLayers = L.featureGroup();
 
 				// Necessary?
-				var tilesURL = tileData.tiles[0].replace( 'http://0', '//0' );
+				$scope.tilesURL = tileData.tiles[0].replace( 'http://0', '//0' );
 
 				// Get container ID
 				// NOTE: Can't get it on init, because the {{index}} component will 
 				// not have been interpolated by Angular yet
 				$scope.container_id = $element.find( '.griot-zoomer' ).first().attr( 'id' );
 
+			};
+
+			$scope.buildZoomer = function(){
+
+				$scope.imageLayers = L.featureGroup();
+				
 				// Build zoomer and store instance in scope
 				$scope.zoomer = Zoomer.zoom_image({
 					container: $scope.container_id,
-					tileURL: tilesURL,
-					imageWidth: tileData.width,
-					imageHeight: tileData.height
+					tileURL: $scope.tilesURL,
+					imageWidth: $scope.tileData.width,
+					imageHeight: $scope.tileData.height
 				});
 
 				$scope.zoomer.map._zoomAnimated = false;
@@ -114,8 +121,36 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 					_this.watchForExternalDeletion();
 
 				}
+			}
 
-			};
+
+			/**
+			 * Destroy zoomer
+			 */
+			this.destroyZoomer = $scope.destroyZoomer = function( destructive ) {
+
+				if( 'undefined' === typeof destructive ){
+					destructive = false;
+				}
+
+				if( ! $scope.zoomer ) {
+					return;
+				}
+
+				$scope.zoomer.map.remove();
+				delete $scope.zoomer;
+				delete Zoomer.zoomers[ $scope.container_id ];
+				
+				if( destructive ){
+					$timeout( function() {
+						$element.find( '.griot-zoomer' ).empty();
+						$scope.imageID = null;
+						$scope.imageLayers = null;
+						$scope.model[ 'annotations' ] = [];
+					});
+				}
+
+			}
 
 
 			/**
@@ -207,29 +242,6 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 
 			/**
-			 * Destroy zoomer
-			 */
-			this.destroyZoomer = function() {
-
-				if( ! $scope.zoomer ) {
-					return;
-				}
-
-				$scope.zoomer.map.remove();
-				delete $scope.zoomer;
-				$element.find( '.griot-zoomer' ).empty();
-				$scope.imageID = null;
-				$scope.imageLayers = null;
-				delete Zoomer.zoomers[ $scope.container_id ];
-				
-				$timeout( function() {
-					$scope.model[ 'annotations' ] = [];
-				});
-
-			}
-
-
-			/**
 			 * Retrieve the zoomer instance
 			 */
 			this.getZoomer = function() {
@@ -266,6 +278,20 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				return $scope.imageLayers;
 			};
 
+			$scope.isVisible = function() {
+
+				var visible = true;
+
+				// Walk up the parents - abort if a parent is a swiper slide that is not active
+				$element.parents().each( function( i, el ){
+					if( $(el).hasClass( 'griot-repeater-item' ) && ! $(el).hasClass( 'swiper-slide-active' ) ){
+						visible = false;
+					}
+				});
+
+				return visible;
+			}
+
 		},
 		link: function( scope, elem, attrs ) {
 
@@ -282,7 +308,26 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			elem.find( 'select' ).on( 'change', function() {
 				scope.checkForTiles();
 			});
-	
+
+			scope.$on( 'slidesReady', function(){
+				if( scope.isVisible() ){
+					setTimeout( function(){
+						if( 'undefined' === typeof scope.zoomer ){
+							scope.buildZoomer();
+						}
+					}, 500 );
+				}
+			});
+
+			scope.$on( 'slideChange', function(){
+				if( 'undefined' !== typeof scope.zoomer ){
+					scope.destroyZoomer( false );
+				}
+
+				if( scope.isVisible() && 'undefined' === typeof scope.zoomer ){
+					scope.buildZoomer();
+				}				
+			});
 
 		}
 

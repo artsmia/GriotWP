@@ -58,6 +58,13 @@ angular.module( 'griot' ).directive( 'repeater', function( $timeout ) {
 					paginationActiveClass: 'active',
 					onSlideChangeStart: function(){
     				$scope.refreshNav();
+    				//$scope.$broadcast( 'slideChange' );
+  				},
+  				onSlideChangeEnd: function(){
+  					$scope.$broadcast( 'slideChange' );
+  				},
+  				onInit: function(){
+  					$scope.$broadcast( 'slidesReady' );
   				},
   				noSwiping: true,
   				noSwipingClass: 'griot-prevent-swipe'
