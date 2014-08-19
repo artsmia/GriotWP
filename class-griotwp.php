@@ -8,7 +8,7 @@
  *
  * @since 0.0.1
  */
-class Griot{
+class GriotWP{
 
 
 	/**
@@ -16,7 +16,7 @@ class Griot{
 	 *
 	 * @since 0.0.1
 	 */
-	function flush_rewrite_rules() {
+	static function flush_rewrite_rules() {
 		flush_rewrite_rules();
 	}
 
@@ -198,6 +198,51 @@ class Griot{
 
 
 	/**
+	 * Register user posts table.
+	 *
+	 * @since 0.0.1
+	 */
+	static function register_user_posts_table() {
+
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . "gwp_user_posts";
+
+		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+			`ID` int(11) NOT NULL AUTO_INCREMENT,
+			`post_id` int(11) NOT NULL,
+			`user_id` int(11) NOT NULL,
+			PRIMARY KEY (`ID`) )";
+
+		$wpdb->query($sql);
+
+	}
+
+
+	/**
+	 * Register user posts table.
+	 *
+	 * @since 0.0.1
+	 */
+	static function register_media_status_table() {
+
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . "gwp_media_status";
+
+		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+			`ID` int(11) NOT NULL AUTO_INCREMENT,
+			`post_id` int(11) NOT NULL,
+			`media` varchar(45) NOT NULL,
+			`status` varchar(45) NOT NULL,
+			PRIMARY KEY (`ID`) )";
+
+		$wpdb->query($sql);
+
+	}
+
+
+	/**
 	 * Define endpoint for retrieving JSON.
 	 *
 	 * @since 0.0.1
@@ -234,7 +279,7 @@ class Griot{
 	 *
 	 * @since 0.0.1
 	 */
-	function build_record_list() {
+	static function build_record_list() {
 
 		global $wpdb;
 
@@ -588,7 +633,7 @@ class Griot{
 		add_meta_box(
 			'griot-related-records',
 			 __( 'Related Stories', 'griot' ),
-			array( $this, 'related_records_metabox_template' ),
+			array( $this, 'render_related_records_metabox' ),
 			'object',
 			'side'
 		);
@@ -601,7 +646,7 @@ class Griot{
 	 *
 	 * @since 0.0.1
 	 */
-	function related_records_metabox_template() {
+	function render_related_records_metabox() {
 		?>
 
 		<p>Select stories related to this object.</p>
@@ -818,13 +863,6 @@ class Griot{
 	 * @param array $templates Templates to be used for each post type.
 	 */
 	function __construct( $templates ) {
-
-		// Activation: update rewrite rules and build list of records
-		register_activation_hook( __FILE__, array( $this, 'flush_rewrite_rules' ) );
-		register_activation_hook( __FILE__, array( $this, 'build_record_list' ) );
-
-		// Deactivation: update rewrite rules
-		register_deactivation_hook( __FILE__, array( $this, 'flush_rewrite_rules' ) );
 
 		// Register templates
 		$this->templates = $templates;
