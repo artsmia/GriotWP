@@ -11,7 +11,7 @@ angular.module( 'griot' ).directive( 'switchgroup', function( $compile, ModelCha
 
 				return type === $scope.model[ $scope.switchName ];
 
-			}
+			};
 
 		},
 		template: function( elem, attrs ) {
@@ -29,6 +29,6 @@ angular.module( 'griot' ).directive( 'switchgroup', function( $compile, ModelCha
 
 		}
 
-	}
+	};
 
 });

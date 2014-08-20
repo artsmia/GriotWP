@@ -16,7 +16,7 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, ModelChain 
 		tileServer: griotData.tileServer,
 		zoomables: griotData.config,
 		objects: []
-	}
+	};
 
 	if( griotData.config ) {
 

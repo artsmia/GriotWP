@@ -13,6 +13,6 @@ angular.module( 'griot' ).directive( 'fieldset', function() {
 			return griotData.templateUrl;
 		}
 
-	}
+	};
 
 });

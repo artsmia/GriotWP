@@ -103,7 +103,7 @@ angular.module( 'griot' ).directive( 'imagepicker', function( $compile ) {
     			$scope.angframe.isOpen = ! $scope.angframe.isOpen;
     		}
 
-    	}
+    	};
 
 			$scope.openFrame = function() {
 
@@ -123,7 +123,7 @@ angular.module( 'griot' ).directive( 'imagepicker', function( $compile ) {
 
 				$scope.isImageTarget = true;
 
-			}
+			};
 
 			$scope.removeImage = function() {
 
@@ -136,7 +136,7 @@ angular.module( 'griot' ).directive( 'imagepicker', function( $compile ) {
 				$scope.backgroundImage = 'auto';
 				$scope.angframe.close();
 
-			}
+			};
 
 		},
 		link: function( scope, elem, attrs ) {
@@ -150,7 +150,7 @@ angular.module( 'griot' ).directive( 'imagepicker', function( $compile ) {
 
 		}
 
-	}
+	};
 
 });
 
@@ -175,4 +175,4 @@ wp.media.griotImageLibrary = {
 
 	},
 
-}
+};

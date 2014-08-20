@@ -17,7 +17,7 @@ angular.module( 'griot' ).directive( 'switch', function( ModelChain ) {
 				default: $attrs.default,
 				types: []
 
-			}
+			};
 
 			this.registerType = function( type, label ) {
 
@@ -30,11 +30,11 @@ angular.module( 'griot' ).directive( 'switch', function( ModelChain ) {
 				console.log( 'Registered ' + type );
 				console.log( $scope.switchers[ $attrs.name ].types );
 
-			}
+			};
 
 			this.getSwitchName = function() {
 				return $attrs.name;
-			}
+			};
 
 		},
 		template: function( elem, attrs ) {
@@ -60,6 +60,6 @@ angular.module( 'griot' ).directive( 'switch', function( ModelChain ) {
 
 		}
 
-	}
+	};
 
 });

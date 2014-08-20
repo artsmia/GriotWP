@@ -119,6 +119,6 @@ angular.module( 'griot' ).factory( 'ModelChain', function() {
 
 		}
 
-	}
+	};
 
 });

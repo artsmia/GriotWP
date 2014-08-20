@@ -1,0 +1,28 @@
+/* -------------------------------------------------------------------------- *
+ * SETTINGS PAGE
+ * -------------------------------------------------------------------------- */
+
+#griot-image-list-setting{
+	width:100%;
+	height:300px;
+}
+#griot-tile-server{
+	width:100%;
+}
+#griot-tile-server-response{
+	@include transition( all 200ms linear );
+	display:none;
+	padding:7px 10px;
+	background-color:#eee;
+	border:1px solid #ccc;
+
+	&.success{
+		background-color:#ebffeb;
+		border:1px solid #009d00;
+	}
+
+	&.error{
+		background-color:#ffebeb;
+		border:1px solid #b00000;
+	}
+}

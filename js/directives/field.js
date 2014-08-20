@@ -22,7 +22,7 @@ angular.module( 'griot' ).directive( 'field', function() {
 
 			$scope.toggleProtection = function() {
 				$scope.protected = ! $scope.protected;
-			}
+			};
 
 			/**
 			 * Update ModelChain, unless the template of this type of field includes
@@ -125,7 +125,7 @@ angular.module( 'griot' ).directive( 'field', function() {
 							selected: jQuery( option ).prop( 'selected' )
 						});
 					});
-					attrs[ 'jsonFieldOptions' ] = angular.toJson( tempFieldOptions );
+					attrs.jsonFieldOptions = angular.toJson( tempFieldOptions );
 					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='option.value as option.label for option in fieldOptions'></select>";
 					break;
 

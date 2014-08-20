@@ -236,5 +236,5 @@ angular.module( 'griot' ).directive( 'annotations', function( $timeout, $compile
 				}
 			);
 		}
-	}
+	};
 });

@@ -304,7 +304,7 @@ angular.module( 'griot' ).directive( 'repeater', function( $timeout ) {
 
 			this.stopInitializing = function() {
 				$scope.initializing = false;
-			}
+			};
 
 		},
 		template: function( elem, attrs ) {

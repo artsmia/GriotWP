@@ -320,8 +320,8 @@ class GriotWP{
 				false
 			);
 			wp_enqueue_style(
-				'griot_admin',
-				plugins_url( 'css/griot-admin.css', __FILE__ ),
+				'gwp_dashicons',
+				plugins_url( 'css/dashicons.css', __FILE__ ),
 				false
 			);
 
@@ -428,119 +428,14 @@ class GriotWP{
 
 			// Griot
 			wp_enqueue_style(
-				'griot',
-				plugins_url( 'css/griot.css', __FILE__ ),
+				'gwp_css',
+				plugins_url( 'css/gwp.css', __FILE__ ),
 				false
 			);
 			wp_enqueue_script(
-				'griot',
-				plugins_url( 'js/griot.js', __FILE__ ),
+				'gwp_js',
+				plugins_url( 'dist/gwp.min.js', __FILE__ ),
 				'angular',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-main',
-				plugins_url( 'js/controllers/main.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-modelchain',
-				plugins_url( 'js/services/modelchain.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-get-title',
-				plugins_url( 'js/filters/get-title.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-parseint',
-				plugins_url( 'js/filters/parseInt.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-annotatedimage',
-				plugins_url( 'js/directives/zoomer.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-annotations',
-				plugins_url( 'js/directives/annotations.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-ckeditor',
-				plugins_url( 'js/directives/ckeditor.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-field',
-				plugins_url( 'js/directives/field.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-fieldset',
-				plugins_url( 'js/directives/fieldset.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-repeater-fields',
-				plugins_url( 'js/directives/griot-repeater-fields.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-repeater',
-				plugins_url( 'js/directives/repeater.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script( 
-				'griot-image',
-				plugins_url( 'js/directives/imagepicker.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script(
-				'griot-switch',
-				plugins_url( 'js/directives/switch.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script(
-				'griot-switchgroup',
-				plugins_url( 'js/directives/switchgroup.js', __FILE__ ),
-				'griot',
-				null,
-				true
-			);
-			wp_enqueue_script(
-				'griot-filter-objects',
-				plugins_url( 'js/filters/filter-objects.js', __FILE__ ),
-				'griot',
 				null,
 				true
 			);
@@ -557,15 +452,9 @@ class GriotWP{
 		// Enqueue special scripts and styles for settings page
 		if( 'settings_page_griotwp' == $screen->id ) {
 
-			// Griot Settings
-			wp_enqueue_style(
-				'griot_settings',
-				plugins_url( 'css/griot-settings.css', __FILE__ ),
-				false
-			);
 			wp_enqueue_script(
 				'griot_settings',
-				plugins_url( 'js/griot-settings.js', __FILE__ ),
+				plugins_url( 'js/gwp-settings.js', __FILE__ ),
 				false,
 				null,
 				true
@@ -605,7 +494,7 @@ class GriotWP{
 		);
 
 		wp_localize_script(
-			'griot',
+			'gwp_js',
 			'griotData',
 			$griotData
 		);

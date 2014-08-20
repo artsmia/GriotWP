@@ -1,0 +1,92 @@
+/**
+ * Media queries, vendor prefixes, and base styles for frequently used elements.
+ */
+
+$smallPortrait:'screen and (orientation:portrait) and (max-width:640px)';
+$small:'screen and (min-width:641px), screen and (orientation:landscape)';
+$medium:'screen and (min-width:1024px)';
+
+@mixin box-sizing( $params ) {
+  -webkit-box-sizing:$params;
+  -moz-box-sizing:$params;
+  box-sizing:$params;
+}
+@mixin box-shadow( $params... ) {
+  -webkit-box-shadow:$params;
+  -moz-box-shadow:$params;
+  box-shadow:$params;
+}
+@mixin transition( $params... ) {
+  -webkit-transition: $params;
+  -moz-transition: $params;
+  -o-transition: $params;
+}
+@mixin transform( $params ) {
+  -webkit-transform:$params;
+  -moz-transform:$params;
+  -o-transform:$params;
+  -ms-transform:$params;
+  transform:$params;
+}
+@mixin transform-origin( $params ) {
+  -webkit-transform-origin:$params;
+  -moz-transform-origin:$params;
+  -o-transform-origin:$params;
+  -ms-transform-origin:$params;
+  transform-origin:$params;
+}
+@mixin no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+@mixin label{
+  color:#222;
+  font-size:0.8em;
+  font-family:'Source Sans Pro', sans-serif;
+  text-align:center;
+  text-transform:uppercase;
+}
+@mixin meta{
+  color:#888;
+  font-size:0.9em;
+  font-family:'Source Sans Pro', sans-serif;
+  font-style:italic;
+}
+@mixin icon( $content ){
+  font-style:normal;
+  cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  &:before{
+    position:absolute;
+    display:block;
+    top:50%;
+    width:100%;
+    text-align:center;
+    line-height:100%;
+    font-family:'griot';
+    content: $content;
+
+    // -- rev -- //
+    //font-size:24px;
+    //margin-top:-12px;
+    left:0;
+  }
+}
+@mixin truncate {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.transparentized{
+  @include transition( opacity 300ms ease-out );
+  opacity: 0 !important;
+}
+.detransparentized {
+  @include transition( opacity 150ms ease-in );
+}

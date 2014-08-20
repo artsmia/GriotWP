@@ -6,5 +6,5 @@
 angular.module( 'griot' ).filter( 'parseInt', function() {
  	return function( record ) {
  		return parseInt( record );
- 	}
+ 	};
 });

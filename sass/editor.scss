@@ -1,0 +1,398 @@
+/* -------------------------------------------------------------------------- *
+ * EDITOR WORKSPACE
+ * -------------------------------------------------------------------------- */
+
+#griot-data{
+	width:100%;
+	height:500px;
+	display:none; /* Comment this line out to check JSON structure */
+}
+#griot{
+	margin-bottom:25px;
+}
+.griot-field-wrap{
+	margin-top:20px;
+}
+.griot-field input[type='text'],
+.griot-field textarea,
+.griot-field select{
+	display:block;
+	width:100%;
+	max-width:100%;
+}
+.griot-field-meta{
+	display:block;
+	width:100%;
+	margin:0px 0px 7px;
+}
+
+
+/* -------------------------------------------------------------------------- *
+ * GENERAL UI ELEMENTS
+ * -------------------------------------------------------------------------- */
+
+.griot-label{
+	display:inline-block;
+	text-transform:uppercase;
+	font-weight:bold;
+	color:#666;
+	font-size:12px;
+	margin-right:7px;
+}
+.griot-button{
+	@include box-shadow( inset 0 1px 0 #fff, 0 1px 0 rgba(0,0,0,.08) );
+	display:inline-block;
+	background-color:#f7f7f7;
+	color:#222;
+	height:22px;
+	line-height:22px;
+	padding:0px 8px 1px;
+	font-size:11px;
+	border-radius:3px;
+	border:1px solid #ccc;
+	cursor:pointer;
+	margin-right:7px;
+
+	&:hover{
+		background-color:#fafafa;
+		border-color:#999;
+		color:#222;
+	}
+
+	&[disabled],
+	&[disabled]:hover{
+		opacity:0.5;
+		border-color:#ccc;
+		background-color:#f7f7f7;
+		cursor:default;
+	}
+}
+
+.griot-icon{
+	font-family:dashicons;
+	font-size:20px;
+}
+.griot-icon-menu:before{
+	content:'\f333';
+}
+.griot-icon-delete:before{
+	content:'\f335';
+}
+.griot-icon-shiftleft:before{
+	content:'\f341';
+}
+.griot-icon-shiftright:before{
+	content:'\f345';
+}
+.griot-icon-prev:before{
+	content:'\f141';
+	font-size:24px;
+}
+.griot-icon-next:before{
+	content:'\f139';
+	font-size:24px;
+}
+
+
+/* -------------------------------------------------------------------------- *
+ * REPEATERS
+ * -------------------------------------------------------------------------- */
+
+.griot-repeater{
+	border-right:1px solid #ccc;
+	border-left:1px solid #ccc;
+
+	&.collapsed{
+		border-top:0px;
+		border-bottom:0px;
+	}
+}
+.griot-repeater-header{
+	@include box-shadow( 0 2px 4px rgba(0,0,0,0.13) );
+	height:30px;
+	width:100%;
+	position:relative;
+	z-index:2;
+	box-sizing:border-box;
+	border-top:1px solid #ccc;
+}
+.griot-repeater-nav{
+	position:absolute;
+	display:block;
+	width:30px;
+	height:30px;
+	color:#666;
+	text-align:center;
+	line-height:30px;
+	cursor:pointer;
+
+	&:hover{
+		background-color:#fafafa;
+		color:#222;
+	}
+
+	&.disabled,
+	&.disabled:hover{
+		background-color:transparent;
+		color:#ccc;
+	}
+
+	&.prev{
+		left:0;
+		border-right:1px solid #ddd;
+	}
+
+	&.next{
+		right:0;
+		border-left:1px solid #ddd;
+	}
+}
+.griot-repeater-pagination{
+	position:absolute;
+	width:100%;
+	height:30px;
+	text-align:center;
+}
+.griot-repeater-bullet{
+	background-color:#999;
+	border-radius:1000px;
+	width:12px;
+	height:12px;
+	line-height:30px;
+	display:inline-block;
+	margin-right:5px;
+	margin-top:9px;
+	vertical-align:middle;
+	cursor:pointer;
+
+	&.active{
+		background-color:#333;
+	}
+}
+.griot-repeater-container{
+	@include box-shadow(inset 0 0 6px rgba(0,0,0,0.13) );
+	position:relative;
+	width:100%;
+	background-color:#ccc;
+}
+.griot-repeater-item{
+	@include box-shadow(inset 0 0 8px rgba(0,0,0,0.13) );
+	@include box-sizing( border-box );
+	position:relative;
+	width:100%;
+	padding:10px;
+	background-color:#f1f1f1;
+	border-bottom:1px solid #ccc;
+}
+.griot-repeater-meta-wrap{
+	position:absolute;
+	top:0;
+	left:0;
+	bottom:0;
+	width:30px;
+	background-color:#666;
+}
+.griot-repeater-meta{
+	@include transform( rotate(-90deg) );
+	@include transform-origin( 0 );
+	position:absolute;
+	display:block;
+	width:500px;
+	top:530px;
+	left:15px;
+	text-align:right;
+	color:#eee;
+	text-transform:uppercase;
+	font-size:12px;
+	font-weight:bold;
+}
+.griot-repeater-menu-toggle{
+	position:absolute;
+	display:block;
+	top:0;
+	left:0;
+	width:30px;
+	height:30px;
+	color:#f7f7f7;
+	font-size:20px;
+	line-height:30px;
+	text-align:center;
+	vertical-align:middle;
+	cursor:pointer;
+	border-bottom:1px solid #ccc;
+
+	&:hover,
+	&.active{
+		background-color:#333;
+		color:#fafafa;
+	}
+}
+.griot-repeater-menu{
+	@include box-shadow(2px 0 6px rgba(0,0,0,0.25) );
+	position:absolute;
+	top:0;
+	left:30px;
+	bottom:0px;
+	background-color:#666;
+	border-left:1px solid #ccc;
+	color:#f7f7f7;
+	z-index:1001;
+}
+.griot-repeater-menu-option{
+	display:block;
+	height:30px;
+	white-space:nowrap;
+	border-bottom:1px solid #ccc;
+	cursor:pointer;
+
+	&:hover{
+		background-color:#333;
+	}
+
+	&.disabled,
+	&.disabled:hover{
+		background-color:#ccc;
+	}
+}
+.griot-repeater-menu-option-icon{
+	display:inline-block;
+	width:30px;
+	height:30px;
+	line-height:30px;
+	text-align:center;
+	vertical-align:middle;
+	color:#f7f7f7;
+
+	&:hover{
+		color:#fafafa;
+	}
+}
+.griot-repeater-menu-option-label{
+	white-space:nowrap;
+	display:inline-block;
+	font-size:11px;
+	text-transform:uppercase;
+	color:#f7f7f7;
+	padding-right:20px;
+	line-height:30px;
+	vertical-align:middle;
+
+	&:hover{
+		color:#fafafa;
+	}
+}
+.griot-repeater-fields{
+	@include box-sizing( border-box );
+	width:100%;
+	padding-left:30px;
+	min-height:150px;
+}
+
+
+/* -------------------------------------------------------------------------- *
+ * CONNECTIONS
+ * -------------------------------------------------------------------------- */
+
+#griot-related-records select{
+	min-height:150px;
+}
+
+
+/* -------------------------------------------------------------------------- *
+ * ZOOMERS
+ * -------------------------------------------------------------------------- */
+
+.griot-zoomer{
+	width:100%;
+	height:500px;
+	margin-top:15px;
+
+	&.noAnnotations{
+		display:inline-block;
+		width:250px;
+		height:250px;
+		margin:15px 15px 0px 0px;
+	}
+}
+
+
+/* -------------------------------------------------------------------------- *
+ * IMAGEPICKERS
+ * -------------------------------------------------------------------------- */
+
+.griot-current-image{
+	@include box-shadow( inset 0 0 4px rgba(0,0,0,0.13) );
+	width:150px;
+	height:150px;
+	border:1px solid #ccc;
+	background-color:#fff;
+	background-size:contain;
+	background-position:center center;
+	background-repeat:no-repeat;
+	cursor:pointer;
+
+	&.empty{
+		text-align:center;
+		line-height:150px;
+		vertical-align:middle;
+		text-transform:uppercase;
+		font-size:12px;
+		font-weight:bold;
+		color:#666;
+		background: #ffffff; /* Old browsers */
+		background: -moz-radial-gradient(center, ellipse cover,  #ffffff 0%, #e5e5e5 100%); /* FF3.6+ */
+		background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5)); /* Chrome,Safari4+ */
+		background: -webkit-radial-gradient(center, ellipse cover,  #ffffff 0%,#e5e5e5 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-radial-gradient(center, ellipse cover,  #ffffff 0%,#e5e5e5 100%); /* Opera 12+ */
+		background: -ms-radial-gradient(center, ellipse cover,  #ffffff 0%,#e5e5e5 100%); /* IE10+ */
+		background: radial-gradient(ellipse at center,  #ffffff 0%,#e5e5e5 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+		&:after{
+			content:'No image selected';
+		}
+	}
+
+	&:hover,
+	&.empty:hover{
+		border-color:#666;
+	}
+
+	.griot-protected &{
+		opacity:0.5;
+		cursor:default;
+
+		&:hover{
+			border-color:#ccc;
+		}
+	}
+}
+.griot-image-chooser{
+	@include box-shadow( inset 0 0 4px rgba(0,0,0,0.13) );
+	@include transition( height 100ms ease );
+	background-color:#ddd;
+	height:0px;
+	overflow-y:hidden;
+	overflow-x:scroll;
+	white-space:nowrap;
+	margin:15px 0px;
+	cursor:pointer;
+
+	&.active{
+		height:150px;
+	}
+
+	img{
+		@include transition( margin 100ms ease, box-shadow 100ms ease );
+		@include box-shadow( 0 2px 4px rgba(0,0,0,0.25) );
+		display:inline-block;
+		height:100px;
+		width:auto;
+		margin:25px 12px;
+
+		&:hover{
+			@include box-shadow( 0 9px 11px rgba(0,0,0,0.25) );
+			margin:18px 12px 32px;
+		}
+	}
+}

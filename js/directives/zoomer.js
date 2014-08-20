@@ -133,7 +133,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 					_this.watchForExternalDeletion();
 
 				}
-			}
+			};
 
 
 			/**
@@ -159,14 +159,14 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				if( destroyData ){
 					$element.find( '.griot-zoomer' ).empty();
 					$scope.imageID = null;
-					$scope.model[ 'annotations' ] = [];
+					$scope.model.annotations = [];
 
 					// Unnecessary and throws an error on image ID change.
 					// watchForExternalDeletion will take care of removing image layers.
 					//$scope.imageLayers = null;
 				}
 
-			}
+			};
 
 
 			/**
@@ -262,14 +262,14 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			 */
 			this.getZoomer = function() {
 				return $scope.zoomer ? $scope.zoomer : null; 
-			}
+			};
 
 
 			/**
 			 * Retrieve the reference to the annotations repeater
 			 */
 			this.getAnnotations = function() {
-				return $scope.model[ $attrs.annotationsName ];;
+				return $scope.model[ $attrs.annotationsName ];
 			};
 
 			$scope.zoomOut = function() {
@@ -306,7 +306,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				});
 
 				return visible;
-			}
+			};
 
 		},
 		link: function( scope, elem, attrs ) {
@@ -350,7 +350,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 		}
 
-	}
+	};
 
 });
 

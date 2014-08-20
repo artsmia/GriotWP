@@ -62,6 +62,6 @@ angular.module( 'griot' ).directive( 'griotRepeaterFields', function( $timeout )
 
 		}
 
-	}
+	};
 
 });
