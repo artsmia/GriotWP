@@ -15,7 +15,10 @@ gulp.task('lint', function() {
 
 gulp.task('sass', function() {
 	return gulp.src('sass/all.scss')
-		.pipe(sass())
+		.pipe(sass({
+			outputStyle: 'compressed',
+			errLogToConsole: true
+		}))
 		.pipe(rename('gwp.css'))
 		.pipe(gulp.dest('css'));
 });
@@ -31,7 +34,7 @@ gulp.task('scripts', function() {
 });
 
 gulp.task('watch', function() {
-	gulp.watch('js/*.js', ['lint', 'scripts']);
+	gulp.watch(['js/*.js', 'js/*/*.js'], ['lint', 'scripts']);
 	gulp.watch('sass/*.scss', ['sass']);
 });
 

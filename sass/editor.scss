@@ -95,6 +95,75 @@
 
 
 /* -------------------------------------------------------------------------- *
+ * MEDIA DRAWER
+ * -------------------------------------------------------------------------- */
+
+.griot-media-drawer{
+	@include transition( right 150ms ease );
+	@include box-shadow( inset 2px 0 10px rgba(0,0,0,0.5) );
+	@include box-sizing( border-box );
+	position:fixed;
+	top:32px;
+	right:-290px;
+	width:300px;
+	height:100%;
+	padding:0 35px 32px;
+	background-color:#222;
+	border-left:10px solid #444;
+	overflow:scroll;
+	-webkit-overflow-scrolling:touch;
+	z-index:1;
+
+	&.visible{
+		right:0;
+	}
+
+	h2{
+		color:#fff;
+	}
+}
+
+.griot-media{
+	@include clearfix;
+	width:100%;
+	margin:10px 0 35px;
+}
+
+.griot-media-label{
+	color:#ccc;
+	vertical-align:top;
+
+	.griot-media-filter-by-object +&{
+		padding-left:7px;
+	}
+}
+
+.griot-media-search{
+	width:100%;
+	margin-bottom:15px;
+	font-size:1.2em;
+	line-height:1.3em;
+}
+
+.griot-media-thumb{
+	display:block;
+	padding:10px;
+	cursor:pointer;
+
+	&:hover{
+		background-color:#333;
+	}
+
+	img{
+		display:block;
+		max-height:200px;
+		max-width:200px;
+		margin:0 auto;
+	}
+}
+
+
+/* -------------------------------------------------------------------------- *
  * REPEATERS
  * -------------------------------------------------------------------------- */
 

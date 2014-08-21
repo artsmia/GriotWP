@@ -434,7 +434,7 @@ class GriotWP{
 			);
 			wp_enqueue_script(
 				'gwp_js',
-				plugins_url( 'dist/gwp.min.js', __FILE__ ),
+				plugins_url( 'dist/gwp.js', __FILE__ ),
 				'angular',
 				null,
 				true
@@ -489,7 +489,7 @@ class GriotWP{
 			'imageSrc'    => get_option( 'griot_image_source', 'wordpress' ),
 			'imageList'   => $imageList,
 			'tileServer'  => $tileServer,
-			'config'      => json_decode( $this->get_config( $tileServer ) ),
+			'config'      => json_decode( $this->get_config( $tileServer ) )
 
 		);
 

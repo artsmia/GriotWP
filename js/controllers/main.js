@@ -3,7 +3,10 @@
  *
  * Initializes data object and scope chain
  */
-angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, ModelChain ) { 
+angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, ModelChain ) { 
+
+	// Initialize model chain
+	ModelChain.initialize( $scope );
 
 	// Initialize data object and load previously saved data into model. 
 	// See Griot::print_data() in class-griot.php
@@ -34,8 +37,5 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, ModelChain 
 	else {
 		console.log( 'WARNING: No config detected!' );
 	}
-
-	// Initialize model chain
-	ModelChain.initialize( $scope );
 
 });
