@@ -417,7 +417,6 @@ angular.module( 'griot' ).directive( 'ckEditor', function() {
 
     	// Apply CKEditor
       var ck = CKEDITOR.replace( elem[0], {
-        toolbar: null,
         allowedContent: true
       });
 
