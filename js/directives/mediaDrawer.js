@@ -19,7 +19,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http ) {
 			"</div>" +
 			"<div class='griot-media-window'>" +
 				"<div class='griot-media-thumb' ng-repeat='image in media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:20' >" +
-					"<img class='griot-media-image' ng-src='{{image.thumb}}' data-object-id='{{image.object_id}}' data-image-id='{{image.id}}' media-drag />" +
+					"<img class='griot-media-image' ng-src='{{image.thumb}}' data-object-id='{{image.object_id}}' data-image-id='{{image.id}}' data-object-title='{{image.object_title}}' media-drag />" +
 				"</div>" +
 			"</div>" +
 		"</div>",
@@ -52,6 +52,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http ) {
 							image.id = image.file.split('.tif')[0];
 							image.thumb = 'http://tiles.dx.artsmia.org/v2/' + image.file.split('.tif')[0] + '/0/0/0.png';
 							image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
+							image.object_title = meta.title;
 							$scope.media.push( image );
 						}
 					}

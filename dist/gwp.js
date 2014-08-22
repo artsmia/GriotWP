@@ -547,7 +547,8 @@ angular.module( 'griot' ).directive( 'field', function() {
 			switch( attrs.type ){
 
 				case 'objectselector':
-					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object for object in ui.objects' ng-disabled='protected'><option value=''>None</option></select>";
+					attrs.bypassmodel = 'bypassmodel';
+					fieldhtml = "<objectselector name='" + attrs.name + "' />";
 					break;
 
 				case 'text':
@@ -572,9 +573,11 @@ angular.module( 'griot' ).directive( 'field', function() {
 
 					break;
 
+				/* Deprecated by Media Drawer
 				case 'zoomerselector':
 					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object for object in ( ui.objects | filterObjects : ui : data." + attrs.object + " )' ng-disabled='protected'><option value=''>None</option></select>";
 					break;
+				*/
 
 				case 'relationship':
 					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='( record.ID | parseInt ) as ( record | getTitle ) for record in ui.recordList[ ui.oppositeRecordType ]' multiple ng-disabled='protected' ></select>";
@@ -976,7 +979,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http ) {
 			"</div>" +
 			"<div class='griot-media-window'>" +
 				"<div class='griot-media-thumb' ng-repeat='image in media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:20' >" +
-					"<img class='griot-media-image' ng-src='{{image.thumb}}' data-object-id='{{image.object_id}}' data-image-id='{{image.id}}' media-drag />" +
+					"<img class='griot-media-image' ng-src='{{image.thumb}}' data-object-id='{{image.object_id}}' data-image-id='{{image.id}}' data-object-title='{{image.object_title}}' media-drag />" +
 				"</div>" +
 			"</div>" +
 		"</div>",
@@ -1009,6 +1012,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http ) {
 							image.id = image.file.split('.tif')[0];
 							image.thumb = 'http://tiles.dx.artsmia.org/v2/' + image.file.split('.tif')[0] + '/0/0/0.png';
 							image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
+							image.object_title = meta.title;
 							$scope.media.push( image );
 						}
 					}
@@ -1018,6 +1022,90 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http ) {
 		}
 	};
 
+});
+/**
+ * <zoomer> directive
+ *
+ * Sets up a (non-isolate) scope and controller and prints fields needed to
+ * add and annotate zoomable images.
+ */
+angular.module( 'griot' ).directive( 'objectselector', function( ModelChain ) {
+
+	return {
+
+		restrict: 'E',
+		replace:true,
+		template: function( elem, attrs ) {
+			var templateHtml = "<div class='griot-object-selector'>" +
+				"<div class='griot-object-selector-thumb' ng-class='{empty: isEmpty, isDroppable: isDroppable}' ng-style='{ backgroundImage: backgroundImage }'></div>" +
+				"<h3 class='griot-object-selector-title'>{{objectTitle}}</h3>" +
+			"</div>";
+			return templateHtml;
+		},
+		controller: function( $scope, $element, $attrs ) {
+
+			var _this = this;
+
+			$scope.isDroppable = false;
+			$scope.isEmpty = 'undefined' === typeof $scope.model[ $attrs.name ];
+			$scope.objectTitle = '';
+
+			$scope.updateView = function( helper ){
+				$scope.objectTitle = helper.data('object-title');
+				$scope.backgroundImage = 'url(' + helper.attr( 'src' ) + ')';
+				$scope.isEmpty = false;
+			};
+
+		},
+		link: function( scope, elem, attrs ) {
+
+			ModelChain.updateModel( scope, attrs.name );
+
+			elem.find('.griot-object-selector-thumb').droppable({
+
+				over: function(e, ui){
+
+					// Same object; do nothing
+					if( ui.helper.data('object-id') == scope.model[ attrs.name ] ){
+						return;
+					}
+
+					scope.$apply( function(){
+						scope.isDroppable = true;
+					});
+
+				},
+				out: function(){
+					scope.$apply( function(){
+						scope.isDroppable = false;
+					});
+				},
+				drop: function(e, ui){
+
+					// Same object; do nothing
+					/*
+					if( ui.helper.data('object-id') == scope.model[ attrs.name ] ){
+						return;
+					}
+					*/
+
+					scope.$apply( function(){
+
+						// Unhighlight
+						scope.isDroppable = false;
+
+						// Update
+						scope.model[ attrs.name ] = ui.helper.data('object-id').toString();
+
+						// Update VIEW (hacky - should just listen to model - will fix once
+						// remote config matches dev config)
+						scope.updateView( ui.helper );
+
+					});
+				}
+			});
+		}
+	};
 });
 /**
  * <repeater> directive
@@ -1844,6 +1932,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			scope.checkForTiles();
 
 			elem.find('.griot-zoomer').droppable({
+				
 				over: function(e, ui){
 
 					// Same image; do nothing
@@ -1889,13 +1978,6 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 					});
 				}
-			});
-
-			// Destroy and rebuild if ID changes
-			// TODO: Need to call buildZoomer somehow, after tiles loaded
-			elem.find( 'select' ).on( 'change', function() {
-				console.log('changed');
-				scope.checkForTiles();
 			});
 
 			scope.$on( 'slidesReady', function(){

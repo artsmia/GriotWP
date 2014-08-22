@@ -386,12 +386,66 @@
 
 
 /* -------------------------------------------------------------------------- *
+ * OBJECT SELECTOR
+ * -------------------------------------------------------------------------- */
+
+
+.griot-object-selector{
+	@include clearfix;
+}
+.griot-object-selector-thumb{
+	position:relative;
+	float:left;
+	width:150px;
+	height:150px;
+	margin-right:15px;
+	border:1px solid #ccc;
+	background-color:#fff;
+	background-size:contain;
+	background-position:center center;
+	background-repeat:no-repeat;
+
+	&.empty{
+		text-align:center;
+		line-height:150px;
+		vertical-align:middle;
+		text-transform:uppercase;
+		font-size:12px;
+		font-weight:bold;
+		color:#666;
+		background: #ffffff; /* Old browsers */
+		background: -moz-radial-gradient(center, ellipse cover,  #ffffff 0%, #e5e5e5 100%); /* FF3.6+ */
+		background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5)); /* Chrome,Safari4+ */
+		background: -webkit-radial-gradient(center, ellipse cover,  #ffffff 0%,#e5e5e5 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-radial-gradient(center, ellipse cover,  #ffffff 0%,#e5e5e5 100%); /* Opera 12+ */
+		background: -ms-radial-gradient(center, ellipse cover,  #ffffff 0%,#e5e5e5 100%); /* IE10+ */
+		background: radial-gradient(ellipse at center,  #ffffff 0%,#e5e5e5 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+		&:after{
+			content:'No object selected';
+		}
+	}
+
+	&.isDroppable:after{
+		position:absolute;
+		top:0;
+		left:0;
+		width:100%;
+		height:100%;
+		background-color:rgba(0,0,0,0.5);
+		content:'';
+	}
+}
+
+
+/* -------------------------------------------------------------------------- *
  * ZOOMERS
  * -------------------------------------------------------------------------- */
 
 .griot-zoomer{
 	@include transition( border-color 300ms ease );
-	position:relative;
+	position:relative; // For "isDroppable" overlay
 	width:100%;
 	height:500px;
 
@@ -402,16 +456,14 @@
 		margin:15px 15px 0px 0px;
 	}
 
-	&.isDroppable{
-		&:after{
-			position:absolute;
-			top:0;
-			left:0;
-			width:100%;
-			height:100%;
-			background-color:rgba(0,0,0,0.5);
-			content:'';
-		}
+	&.isDroppable:after{
+		position:absolute;
+		top:0;
+		left:0;
+		width:100%;
+		height:100%;
+		background-color:rgba(0,0,0,0.5);
+		content:'';
 	}
 }
 

@@ -323,6 +323,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			scope.checkForTiles();
 
 			elem.find('.griot-zoomer').droppable({
+				
 				over: function(e, ui){
 
 					// Same image; do nothing
@@ -368,13 +369,6 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 					});
 				}
-			});
-
-			// Destroy and rebuild if ID changes
-			// TODO: Need to call buildZoomer somehow, after tiles loaded
-			elem.find( 'select' ).on( 'change', function() {
-				console.log('changed');
-				scope.checkForTiles();
 			});
 
 			scope.$on( 'slidesReady', function(){

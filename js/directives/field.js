@@ -70,7 +70,8 @@ angular.module( 'griot' ).directive( 'field', function() {
 			switch( attrs.type ){
 
 				case 'objectselector':
-					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object for object in ui.objects' ng-disabled='protected'><option value=''>None</option></select>";
+					attrs.bypassmodel = 'bypassmodel';
+					fieldhtml = "<objectselector name='" + attrs.name + "' />";
 					break;
 
 				case 'text':
@@ -95,9 +96,11 @@ angular.module( 'griot' ).directive( 'field', function() {
 
 					break;
 
+				/* Deprecated by Media Drawer
 				case 'zoomerselector':
 					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object for object in ( ui.objects | filterObjects : ui : data." + attrs.object + " )' ng-disabled='protected'><option value=''>None</option></select>";
 					break;
+				*/
 
 				case 'relationship':
 					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='( record.ID | parseInt ) as ( record | getTitle ) for record in ui.recordList[ ui.oppositeRecordType ]' multiple ng-disabled='protected' ></select>";
