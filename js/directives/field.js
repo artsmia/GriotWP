@@ -70,7 +70,6 @@ angular.module( 'griot' ).directive( 'field', function() {
 			switch( attrs.type ){
 
 				case 'objectselector':
-					attrs.bypassmodel = 'bypassmodel';
 					fieldhtml = "<objectselector name='" + attrs.name + "' />";
 					break;
 

@@ -3,13 +3,13 @@
  *
  * Controls drawer for searching and filtering media for zoomers.
  */
-angular.module( 'griot' ).directive( 'mediaDrawer', function( $http ) {
+angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope ) {
 
 	return {
 
 		restrict: 'A',
 		replace: true,
-		template: "<div class='griot-media-drawer' ng-class=\"{'visible':drawerVisible}\" ng-click=''>" +
+		template: "<div class='griot-media-drawer' ng-class=\"{'visible':$root.mediaVisible}\" ng-click=''>" +
 			"<div class='griot-media-controls'>" +
 				"<h2 class='griot-media-header'>Available Media</h2>" +
 				"<p class='griot-media-instructions'>Drag to the left panel to insert.</p>" +
@@ -27,7 +27,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http ) {
 
 			var devZoomables;
 
-			$scope.drawerVisible = true;
+			$rootScope.mediaVisible = false;
 			$scope.media = [];
 
 			$scope.logStart = function(){
