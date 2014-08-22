@@ -23,7 +23,7 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 
 	if( griotData.config ) {
 
-		for( var objectid in griotData.config.objects ) {
+		for( var objectid in griotData.config ) {
 
 			if( 'null' === objectid || '_empty_' === objectid ) {
 				continue;

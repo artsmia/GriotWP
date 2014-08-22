@@ -47,12 +47,14 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				// Do nothing if zoomer exists and image ID has not changed
 				if( newImageID === $scope.imageID && 'undefined' !== typeof $scope.zoomer ) {
+					console.log( 'exiting, zoomer exists and ID has not changed.' );
 					return;
 				}
 
 				// Return if image ID is blank
 				if( ! newImageID ) { 
 					_this.destroyZoomer( true );
+					console.log( 'destroying, no ID' );
 					return;
 				}
 
@@ -69,11 +71,13 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 					_this.destroyZoomer( true );
 
 					// Setup and build
-					_this.setupZoomer( true );
+					console.log( 'have data, setting up' );
+					_this.setupZoomer( false );
 
 				});
 				http.error( function( e ) {
 
+					console.log( 'Destroying, no tile data' );
 					_this.destroyZoomer( true );
 
 				});
@@ -92,8 +96,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				$scope.imageID = $scope.model[ $attrs.name ];
 
-				// Necessary?
-				$scope.tilesURL = $scope.tileData.tiles[0].replace( 'http://0', '//0' );
+				$scope.tilesURL = $scope.tileData.tiles[0];
 
 				// Get container ID
 				// NOTE: Can't get it on init, because the {{index}} component will 
@@ -101,7 +104,9 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				$scope.container_id = $element.find( '.griot-zoomer' ).first().attr( 'id' );
 
 				if( buildZoomer ){
+					console.log( 'buildZoomer is true' );
 					if( $scope.isVisible() ){
+							console.log( 'zoomer is visible, calling buildZoomer' );
 						$scope.buildZoomer();
 					}
 				}
@@ -109,6 +114,8 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			};
 
 			$scope.buildZoomer = function(){
+
+				console.log( 'in buildZoomer' );
 
 				$scope.imageLayers = L.featureGroup();
 

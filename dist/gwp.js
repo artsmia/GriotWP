@@ -43,16 +43,16 @@ jQuery( document ).ready( function() {
 	/** 
 	 * Tile server field
 	 */
-	jQuery( "input[name='griot_tile_server']" ).on( 'change', function( e ) {
+	jQuery( "input[name='griot_config_url']" ).on( 'change', function( e ) {
 
 		if( ! e.target.value ) {
-			jQuery( '#griot-tile-server-response' ).fadeOut( 200, function(){
+			jQuery( '#griot-config-url-response' ).fadeOut( 200, function(){
 				jQuery( this ).removeClass( 'error success' ).html( '' );
 			});
 			return;
 		}
 
-		jQuery( '#griot-tile-server-response' ).removeClass( 'success error' ).html( 'Fetching config ...' ).fadeIn( 200 );
+		jQuery( '#griot-config-url-response' ).removeClass( 'success error' ).html( 'Fetching config ...' ).fadeIn( 200 );
 
 		var request = {
 			action: 'griot_get_config',
@@ -62,7 +62,7 @@ jQuery( document ).ready( function() {
 		jQuery.post( ajaxurl, request, function( data ) {
 
 			if( 'error' === data ) {
-				jQuery( '#griot-tile-server-response' ).removeClass( 'success' ).addClass( 'error' ).html( '<strong>Error:</strong> The tile server config cannot be read. It may be missing, inaccessible, or malformed.' ).fadeIn( 200 );
+				jQuery( '#griot-config-url-response' ).removeClass( 'success' ).addClass( 'error' ).html( '<strong>Error:</strong> The config cannot be read. It may be missing, inaccessible, or malformed.' ).fadeIn( 200 );
 				return;
 			}
 
@@ -70,17 +70,14 @@ jQuery( document ).ready( function() {
 			  objectCount = 0,
 			  imageCount = 0;
 
-			console.log( config );
-
-			for( var prop in config.objects ) {
-				if( !isNaN ( parseFloat( prop ) ) && isFinite( prop ) ) {
+			for( var prop in config ) {
+				if( config.hasOwnProperty( prop ) ){
 					objectCount++;
+					imageCount += config[prop].images.length;
 				}
 			}
 
-			imageCount = config.all.length;
-
-			jQuery( '#griot-tile-server-response' ).removeClass( 'error' ).addClass( 'success' ).html( '<strong>Success!</strong> Found <strong>' + objectCount + '</strong> objects and <strong>' + imageCount + '</strong> zoomable images.' ).fadeIn( 200 );
+			jQuery( '#griot-config-url-response' ).removeClass( 'error' ).addClass( 'success' ).html( '<strong>Success!</strong> Found <strong>' + objectCount + '</strong> objects and <strong>' + imageCount + '</strong> zoomable images.' ).fadeIn( 200 );
 
 		});
 
@@ -139,7 +136,7 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 
 	if( griotData.config ) {
 
-		for( var objectid in griotData.config.objects ) {
+		for( var objectid in griotData.config ) {
 
 			if( 'null' === objectid || '_empty_' === objectid ) {
 				continue;
@@ -571,12 +568,6 @@ angular.module( 'griot' ).directive( 'field', function() {
 					fieldhtml = "<zoomer name='" + attrs.name + "' object='" + attrs.object + "' annotations-name='" + attrs.annotationsName + "' annotations-label='" + attrs.annotationsLabel + "' annotations-label-singular='" + attrs.annotationsLabelSingular + "' annotations-label-plural='" + attrs.annotationsLabelPlural + "'>" + transcrude + "</zoomer>";
 
 					break;
-
-				/* Deprecated by Media Drawer
-				case 'zoomerselector':
-					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='object for object in ( ui.objects | filterObjects : ui : data." + attrs.object + " )' ng-disabled='protected'><option value=''>None</option></select>";
-					break;
-				*/
 
 				case 'relationship':
 					fieldhtml = "<select ng-model='model." + attrs.name + "' ng-options='( record.ID | parseInt ) as ( record | getTitle ) for record in ui.recordList[ ui.oppositeRecordType ]' multiple ng-disabled='protected' ></select>";
@@ -1666,12 +1657,14 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				// Do nothing if zoomer exists and image ID has not changed
 				if( newImageID === $scope.imageID && 'undefined' !== typeof $scope.zoomer ) {
+					console.log( 'exiting, zoomer exists and ID has not changed.' );
 					return;
 				}
 
 				// Return if image ID is blank
 				if( ! newImageID ) { 
 					_this.destroyZoomer( true );
+					console.log( 'destroying, no ID' );
 					return;
 				}
 
@@ -1688,11 +1681,13 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 					_this.destroyZoomer( true );
 
 					// Setup and build
-					_this.setupZoomer( true );
+					console.log( 'have data, setting up' );
+					_this.setupZoomer( false );
 
 				});
 				http.error( function( e ) {
 
+					console.log( 'Destroying, no tile data' );
 					_this.destroyZoomer( true );
 
 				});
@@ -1711,8 +1706,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				$scope.imageID = $scope.model[ $attrs.name ];
 
-				// Necessary?
-				$scope.tilesURL = $scope.tileData.tiles[0].replace( 'http://0', '//0' );
+				$scope.tilesURL = $scope.tileData.tiles[0];
 
 				// Get container ID
 				// NOTE: Can't get it on init, because the {{index}} component will 
@@ -1720,7 +1714,9 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				$scope.container_id = $element.find( '.griot-zoomer' ).first().attr( 'id' );
 
 				if( buildZoomer ){
+					console.log( 'buildZoomer is true' );
 					if( $scope.isVisible() ){
+							console.log( 'zoomer is visible, calling buildZoomer' );
 						$scope.buildZoomer();
 					}
 				}
@@ -1728,6 +1724,8 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			};
 
 			$scope.buildZoomer = function(){
+
+				console.log( 'in buildZoomer' );
 
 				$scope.imageLayers = L.featureGroup();
 
@@ -2038,32 +2036,6 @@ L.extend( L.LatLngBounds.prototype, {
     ]);
 
   }
-
-});
-/**
- * filterObjects filter
- *
- * Return array of zoomables from specified object, or if not specified, from
- * ui.zoomables master array
- */
-angular.module( 'griot' ).filter( 'filterObjects', function() {
-
-  return function( objects, ui, requestedID ) {
-
-  	if( ui.zoomables ) {
-
-	  	if( requestedID ) {
-	  		return ui.zoomables.objects[ requestedID ];
-	  	} else {
-	  		return ui.zoomables.all;
-	  	}
-
-	  }
-	  else {
-	  	console.log( 'WARNING: No config detected!' );
-	  }
-
-  };
 
 });
 /**

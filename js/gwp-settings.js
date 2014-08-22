@@ -3,16 +3,16 @@ jQuery( document ).ready( function() {
 	/** 
 	 * Tile server field
 	 */
-	jQuery( "input[name='griot_tile_server']" ).on( 'change', function( e ) {
+	jQuery( "input[name='griot_config_url']" ).on( 'change', function( e ) {
 
 		if( ! e.target.value ) {
-			jQuery( '#griot-tile-server-response' ).fadeOut( 200, function(){
+			jQuery( '#griot-config-url-response' ).fadeOut( 200, function(){
 				jQuery( this ).removeClass( 'error success' ).html( '' );
 			});
 			return;
 		}
 
-		jQuery( '#griot-tile-server-response' ).removeClass( 'success error' ).html( 'Fetching config ...' ).fadeIn( 200 );
+		jQuery( '#griot-config-url-response' ).removeClass( 'success error' ).html( 'Fetching config ...' ).fadeIn( 200 );
 
 		var request = {
 			action: 'griot_get_config',
@@ -22,7 +22,7 @@ jQuery( document ).ready( function() {
 		jQuery.post( ajaxurl, request, function( data ) {
 
 			if( 'error' === data ) {
-				jQuery( '#griot-tile-server-response' ).removeClass( 'success' ).addClass( 'error' ).html( '<strong>Error:</strong> The tile server config cannot be read. It may be missing, inaccessible, or malformed.' ).fadeIn( 200 );
+				jQuery( '#griot-config-url-response' ).removeClass( 'success' ).addClass( 'error' ).html( '<strong>Error:</strong> The config cannot be read. It may be missing, inaccessible, or malformed.' ).fadeIn( 200 );
 				return;
 			}
 
@@ -30,17 +30,14 @@ jQuery( document ).ready( function() {
 			  objectCount = 0,
 			  imageCount = 0;
 
-			console.log( config );
-
-			for( var prop in config.objects ) {
-				if( !isNaN ( parseFloat( prop ) ) && isFinite( prop ) ) {
+			for( var prop in config ) {
+				if( config.hasOwnProperty( prop ) ){
 					objectCount++;
+					imageCount += config[prop].images.length;
 				}
 			}
 
-			imageCount = config.all.length;
-
-			jQuery( '#griot-tile-server-response' ).removeClass( 'error' ).addClass( 'success' ).html( '<strong>Success!</strong> Found <strong>' + objectCount + '</strong> objects and <strong>' + imageCount + '</strong> zoomable images.' ).fadeIn( 200 );
+			jQuery( '#griot-config-url-response' ).removeClass( 'error' ).addClass( 'success' ).html( '<strong>Success!</strong> Found <strong>' + objectCount + '</strong> objects and <strong>' + imageCount + '</strong> zoomable images.' ).fadeIn( 200 );
 
 		});
 

@@ -460,6 +460,12 @@ class GriotWP{
 				true
 			);
 
+			wp_enqueue_style(
+				'gwp_css',
+				plugins_url( 'css/gwp.css', __FILE__ ),
+				false
+			);
+
 		}
 
 	}
@@ -476,7 +482,8 @@ class GriotWP{
 
 		$imageList = explode( "\r\n", get_option( 'griot_image_list' ) );
 
-		$tileServer = get_option( 'griot_tile_server' );
+		$config_url = get_option( 'griot_config_url' );
+		$tile_server = get_option( 'griot_tile_server' );
 
 		$griotData = array(
 
@@ -488,8 +495,8 @@ class GriotWP{
 			'recordList'  => get_option( 'griot_record_list' ),
 			'imageSrc'    => get_option( 'griot_image_source', 'wordpress' ),
 			'imageList'   => $imageList,
-			'tileServer'  => $tileServer,
-			'config'      => json_decode( $this->get_config( $tileServer ) )
+			'tileServer'  => $tile_server,
+			'config'      => json_decode( $this->get_config( $config_url ) )
 
 		);
 
@@ -602,14 +609,16 @@ class GriotWP{
 	 */
 	function register_settings() {
 
-		register_setting( 'griot_settings', 'griot_tile_server', array( $this, 'sanitize_tile_server_field' ) );
+		register_setting( 'griot_settings', 'griot_tile_server', array( $this, 'sanitize_url' ) );
+		register_setting( 'griot_settings', 'griot_config_url' );
 		register_setting( 'griot_settings', 'griot_image_source' );
 		register_setting( 'griot_settings', 'griot_image_list' );
 
-		add_settings_section( 'griot_zoomable_image_settings', 'Zoomable Images', null, 'griotwp' );
+		add_settings_section( 'griot_server_settings', 'Servers and Data', null, 'griotwp' );
 		add_settings_section( 'griot_static_image_settings', 'Static Images', array( $this, 'render_static_image_section' ), 'griotwp' );
 
-		add_settings_field( 'griot_tile_server', 'Tile Server', array( $this, 'render_tile_server_field' ), 'griotwp', 'griot_zoomable_image_settings' );
+		add_settings_field( 'griot_tile_server', 'Tile Server', array( $this, 'render_tile_server_field' ), 'griotwp', 'griot_server_settings' );
+		add_settings_field( 'griot_config_url', 'Config', array( $this, 'render_config_url_field' ), 'griotwp', 'griot_server_settings' );
 		add_settings_field( 'griot_image_source', 'Image Source', array( $this, 'render_image_source_field' ), 'griotwp', 'griot_static_image_settings' );      
 		add_settings_field( 'griot_image_list', 'Available Static Images', array( $this, 'render_image_list_field' ), 'griotwp', 'griot_static_image_settings' );      
 
@@ -640,7 +649,24 @@ class GriotWP{
 		?>
 
 		<input type='text' name='griot_tile_server' id='griot-tile-server' value='<?php echo $content; ?>' />
-		<p id='griot-tile-server-response'></p>
+
+		<?php
+	}
+
+
+	/**
+	 * Render Config URL field
+	 *
+	 * @since 0.0.1
+	 */
+	function render_config_url_field() {
+
+		$content = get_option( 'griot_config_url' );
+
+		?>
+
+		<input type='text' name='griot_config_url' id='griot-config-url' value='<?php echo $content; ?>' />
+		<p id='griot-config-url-response'></p>
 
 		<?php
 	}
@@ -651,7 +677,7 @@ class GriotWP{
 	 *
 	 * @since 0.0.1
 	 */
-	function sanitize_tile_server_field( $input ) {
+	function sanitize_url( $input ) {
 
 		$sanitized = substr( $input, -1 ) == '/' ? $input : $input . '/';
 
