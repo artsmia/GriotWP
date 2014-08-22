@@ -16,8 +16,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			attrs.hasAnnotations = transcrude ? true : false;
 
 			var templateHtml = "<div class='griot-annotated-image'>" +
-				"<field type='zoomerselector' object='" + attrs.object + "' name='" + attrs.name + "' />" +
-				"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$id}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations }' />";
+				"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$id}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations, isDroppable: isDroppable }' />";
 
 			if( transcrude ) {
 
@@ -35,6 +34,8 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 		controller: function( $scope, $element, $attrs, $timeout ) {
 
 			var _this = this;
+
+			$scope.isDroppable = false;
 
 			/**
 			 * Check to see if image ID leads to tiles
@@ -311,7 +312,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 		},
 		link: function( scope, elem, attrs ) {
 
-			ModelChain.bypassModel( scope );
+			ModelChain.updateModel( scope, attrs.name );
 
 			scope.hasAnnotations = attrs.hasAnnotations;
 
@@ -320,6 +321,54 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 			// Set up zoomers
 			scope.checkForTiles();
+
+			elem.find('.griot-zoomer').droppable({
+				over: function(e, ui){
+
+					// Same image; do nothing
+					if( ui.helper.data('image-id') == scope.model[ attrs.name ] ){
+						return;
+					}
+
+					if( scope.isVisible() ){
+						scope.$apply( function(){
+							scope.isDroppable = true;
+						});
+					}
+				},
+				out: function(){
+					scope.$apply( function(){
+						scope.isDroppable = false;
+					});
+				},
+				drop: function(e, ui){
+
+					// Ignore hidden zoomers
+					if( ! scope.isVisible() ){
+						return;
+					}
+
+					// Same image; do nothing
+					if( ui.helper.data('image-id') == scope.model[ attrs.name ] ){
+						return;
+					}
+
+					scope.$apply( function(){
+
+						// Unhighlight
+						scope.isDroppable = false;
+
+						// Double check with user if there are annotations that will be destroyed
+						if( scope.hasAnnotations && scope.model.annotations.length && ! confirm( 'This will destroy the ' + scope.model.annotations.length + ' annotations attached to this view. Proceed?' ) ){
+							return;
+						}
+
+						scope.model[ attrs.name ] = ui.helper.data('image-id');
+						scope.checkForTiles();
+
+					});
+				}
+			});
 
 			// Destroy and rebuild if ID changes
 			// TODO: Need to call buildZoomer somehow, after tiles loaded

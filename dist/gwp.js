@@ -18,11 +18,11 @@ jQuery( document ).ready( function() {
 
 		// Create main application container and hidden content field
 		.find( '#post-body-content' ).append( "<div id='griot'>" +
-					"<div media-drawer></div>" +
 					"<textarea name='content' id='griot-data'>{{ data | json }}</textarea>" +
 					"<fieldset>" +
 						"<field type='text' name='objectid' label='Object ID' />" +
 					"</fieldset>" +
+					"<div media-drawer></div>" +
 				"</div>" 
 		)
 
@@ -154,82 +154,6 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 		console.log( 'WARNING: No config detected!' );
 	}
 
-});
-/**
- * filterObjects filter
- *
- * Return array of zoomables from specified object, or if not specified, from
- * ui.zoomables master array
- */
-angular.module( 'griot' ).filter( 'filterObjects', function() {
-
-  return function( objects, ui, requestedID ) {
-
-  	if( ui.zoomables ) {
-
-	  	if( requestedID ) {
-	  		return ui.zoomables.objects[ requestedID ];
-	  	} else {
-	  		return ui.zoomables.all;
-	  	}
-
-	  }
-	  else {
-	  	console.log( 'WARNING: No config detected!' );
-	  }
-
-  };
-
-});
-/**
- * filterMediaByObject filter
- *
- * Filters media by current object ID, if applicable and enabled.
- */
-angular.module( 'griot' ).filter( 'filterMediaByObject', function( ModelChain ) {
-
-  return function( media, enabled, objid ) {
-
-		var filtered = [];
-
-  	if( ! enabled ){
-  		return media;
-  	}
-
-    angular.forEach( media, function(image) {
-      if( image.object_id == objid ) {
-        filtered.push( image );
-      }
-    });
-
-    return filtered;
-
-  };
-});
-/**
- * getTitle filter
- *
- * For use in defining relationships between records. Returns the title if one
- * is set, otherwise 'Untitled (post #{ID})'
- */
-angular.module( 'griot' ).filter( 'getTitle', function() {
-
-  return function( record ) {
-
-    return record.post_title === '' ? 'Untitled (post #' + record.ID + ')' : record.post_title;
-
-  };
-
-});
-/**
- * parseInt filter
- *
- * Parses string as integer
- */
-angular.module( 'griot' ).filter( 'parseInt', function() {
- 	return function( record ) {
- 		return parseInt( record );
- 	};
 });
 /**
  * annotations="" directive
@@ -493,15 +417,8 @@ angular.module( 'griot' ).directive( 'ckEditor', function() {
 
     	// Apply CKEditor
       var ck = CKEDITOR.replace( elem[0], {
-        toolbar: [ 
-          [ 'Bold', 'Italic', 'Subscript', 'Superscript', '-', 'NumberedList', 'BulletedList', 'Outdent', 'Indent', '-', 'HorizontalRule', 'SpecialChar', '-', 'PasteFromWord', '-', 'Undo', 'Redo', '-', 'Source' ] 
-        ],
-        allowedContent: {
-          img: {
-            attributes: [ '!src', 'alt', 'width', 'height' ],
-            styles: '*'
-          }
-        }
+        toolbar: null,
+        allowedContent: true
       });
 
       if( repeater ) {
@@ -1023,6 +940,23 @@ wp.media.griotImageLibrary = {
 };
 
 /**
+ * mediaDrag="" directive
+ *
+ * Controls dragging of media.
+ */
+angular.module( 'griot' ).directive( 'mediaDrag', function(){
+
+	return function( scope, elem, attrs ){
+		elem.draggable({
+			helper:'clone',
+			scroll:false,
+			revert:'invalid',
+			revertDuration:300
+		});
+	};
+
+});
+/**
  * mediaDrawer="" directive
  *
  * Controls drawer for searching and filtering media for zoomers.
@@ -1034,13 +968,15 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http ) {
 		restrict: 'A',
 		replace: true,
 		template: "<div class='griot-media-drawer' ng-class=\"{'visible':drawerVisible}\" ng-click=''>" +
-			"<h2>Available Media</h2>" +
-			"<input class='griot-media-search' type='text' ng-model='mediaSearch.meta' id='griot-media-search' placeholder='Search media' />" +
-			"<input class='griot-media-filter-by-object' type='checkbox' ng-model='filterByObject' id='griot-media-filter-by-object' />" +
-			"<label class='griot-media-label' for='griot-media-filter-by-object'>Current object media only</label>" +
-			"<div class='griot-media'>" +
-				"<div class='griot-media-thumb' ng-repeat='image in media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:20'>" +
-					"<img ng-src='{{image.thumb}}' />" +
+			"<div class='griot-media-controls'>" +
+				"<h2>Available Media</h2>" +
+				"<input class='griot-media-search' type='text' ng-model='mediaSearch.meta' id='griot-media-search' placeholder='Search media' />" +
+				"<input class='griot-media-filter-by-object' type='checkbox' ng-model='filterByObject' id='griot-media-filter-by-object' />" +
+				"<label class='griot-media-label' for='griot-media-filter-by-object'>Current object media only</label>" +
+			"</div>" +
+			"<div class='griot-media-window'>" +
+				"<div class='griot-media-thumb' ng-repeat='image in media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:20' >" +
+					"<img class='griot-media-image' ng-src='{{image.thumb}}' data-object-id='{{image.object_id}}' data-image-id='{{image.id}}' media-drag />" +
 				"</div>" +
 			"</div>" +
 		"</div>",
@@ -1050,6 +986,10 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http ) {
 
 			$scope.drawerVisible = true;
 			$scope.media = [];
+
+			$scope.logStart = function(){
+				console.log('start');
+			};
 
 			/**
 			 * Get the dev zoomables (soon to be the config) and arrange into a structure
@@ -1065,8 +1005,8 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http ) {
 						var meta = devZoomables[ objid ].meta;
 						for( var i = 0; i < images.length; i++ ){
 							var image = images[i];
-							var filename = image.file.split('.tif');
 							image.object_id = objid;
+							image.id = image.file.split('.tif')[0];
 							image.thumb = 'http://tiles.dx.artsmia.org/v2/' + image.file.split('.tif')[0] + '/0/0/0.png';
 							image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
 							$scope.media.push( image );
@@ -1597,8 +1537,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			attrs.hasAnnotations = transcrude ? true : false;
 
 			var templateHtml = "<div class='griot-annotated-image'>" +
-				"<field type='zoomerselector' object='" + attrs.object + "' name='" + attrs.name + "' />" +
-				"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$id}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations }' />";
+				"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$id}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations, isDroppable: isDroppable }' />";
 
 			if( transcrude ) {
 
@@ -1616,6 +1555,8 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 		controller: function( $scope, $element, $attrs, $timeout ) {
 
 			var _this = this;
+
+			$scope.isDroppable = false;
 
 			/**
 			 * Check to see if image ID leads to tiles
@@ -1892,7 +1833,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 		},
 		link: function( scope, elem, attrs ) {
 
-			ModelChain.bypassModel( scope );
+			ModelChain.updateModel( scope, attrs.name );
 
 			scope.hasAnnotations = attrs.hasAnnotations;
 
@@ -1901,6 +1842,54 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 			// Set up zoomers
 			scope.checkForTiles();
+
+			elem.find('.griot-zoomer').droppable({
+				over: function(e, ui){
+
+					// Same image; do nothing
+					if( ui.helper.data('image-id') == scope.model[ attrs.name ] ){
+						return;
+					}
+
+					if( scope.isVisible() ){
+						scope.$apply( function(){
+							scope.isDroppable = true;
+						});
+					}
+				},
+				out: function(){
+					scope.$apply( function(){
+						scope.isDroppable = false;
+					});
+				},
+				drop: function(e, ui){
+
+					// Ignore hidden zoomers
+					if( ! scope.isVisible() ){
+						return;
+					}
+
+					// Same image; do nothing
+					if( ui.helper.data('image-id') == scope.model[ attrs.name ] ){
+						return;
+					}
+
+					scope.$apply( function(){
+
+						// Unhighlight
+						scope.isDroppable = false;
+
+						// Double check with user if there are annotations that will be destroyed
+						if( scope.hasAnnotations && scope.model.annotations.length && ! confirm( 'This will destroy the ' + scope.model.annotations.length + ' annotations attached to this view. Proceed?' ) ){
+							return;
+						}
+
+						scope.model[ attrs.name ] = ui.helper.data('image-id');
+						scope.checkForTiles();
+
+					});
+				}
+			});
 
 			// Destroy and rebuild if ID changes
 			// TODO: Need to call buildZoomer somehow, after tiles loaded
@@ -1960,6 +1949,82 @@ L.extend( L.LatLngBounds.prototype, {
 
 });
 /**
+ * filterObjects filter
+ *
+ * Return array of zoomables from specified object, or if not specified, from
+ * ui.zoomables master array
+ */
+angular.module( 'griot' ).filter( 'filterObjects', function() {
+
+  return function( objects, ui, requestedID ) {
+
+  	if( ui.zoomables ) {
+
+	  	if( requestedID ) {
+	  		return ui.zoomables.objects[ requestedID ];
+	  	} else {
+	  		return ui.zoomables.all;
+	  	}
+
+	  }
+	  else {
+	  	console.log( 'WARNING: No config detected!' );
+	  }
+
+  };
+
+});
+/**
+ * filterMediaByObject filter
+ *
+ * Filters media by current object ID, if applicable and enabled.
+ */
+angular.module( 'griot' ).filter( 'filterMediaByObject', function( ModelChain ) {
+
+  return function( media, enabled, objid ) {
+
+		var filtered = [];
+
+  	if( ! enabled ){
+  		return media;
+  	}
+
+    angular.forEach( media, function(image) {
+      if( image.object_id == objid ) {
+        filtered.push( image );
+      }
+    });
+
+    return filtered;
+
+  };
+});
+/**
+ * getTitle filter
+ *
+ * For use in defining relationships between records. Returns the title if one
+ * is set, otherwise 'Untitled (post #{ID})'
+ */
+angular.module( 'griot' ).filter( 'getTitle', function() {
+
+  return function( record ) {
+
+    return record.post_title === '' ? 'Untitled (post #' + record.ID + ')' : record.post_title;
+
+  };
+
+});
+/**
+ * parseInt filter
+ *
+ * Parses string as integer
+ */
+angular.module( 'griot' ).filter( 'parseInt', function() {
+ 	return function( record ) {
+ 		return parseInt( record );
+ 	};
+});
+/**
  * ModelChain service
  *
  * Tells nested fields and repeaters where in the $scope.data object to store
@@ -1970,8 +2035,10 @@ L.extend( L.LatLngBounds.prototype, {
  * 
  * modelChain maintains an array representing the chain of elements above the 
  * current field element, i.e. ['data', 'repeater1', '0', 'repeater2', '1', 
- * 'fieldname' ]. model converts modelChain into a reference to the proper
- * storage location in $scope.data. 
+ * 'fieldname' ] would refer to the fieldname in the second slide of a repeater
+ * that is nested in the first slide of another repeater which sits at the top
+ * level. model converts modelChain into a reference to the proper storage 
+ * location in $scope.data. 
  * 
  * NOTE: model in fact resolves to the level just above the field name, so 
  * that the directive template can define ng-model as 'model.fieldname' and 

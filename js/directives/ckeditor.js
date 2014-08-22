@@ -20,15 +20,8 @@ angular.module( 'griot' ).directive( 'ckEditor', function() {
 
     	// Apply CKEditor
       var ck = CKEDITOR.replace( elem[0], {
-        toolbar: [ 
-          [ 'Bold', 'Italic', 'Subscript', 'Superscript', '-', 'NumberedList', 'BulletedList', 'Outdent', 'Indent', '-', 'HorizontalRule', 'SpecialChar', '-', 'PasteFromWord', '-', 'Undo', 'Redo', '-', 'Source' ] 
-        ],
-        allowedContent: {
-          img: {
-            attributes: [ '!src', 'alt', 'width', 'height' ],
-            styles: '*'
-          }
-        }
+        toolbar: null,
+        allowedContent: true
       });
 
       if( repeater ) {

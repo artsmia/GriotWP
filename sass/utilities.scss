@@ -80,3 +80,17 @@ $medium:'screen and (min-width:1024px)';
     zoom:1;
   }
 }
+@mixin displayFlex( $direction, $wrap ){
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: $direction;
+  flex-flow: $direction;
+  flex-direction: $direction;
+  -webkit-flex-wrap: $wrap;
+  flex-wrap: $wrap;
+}
+@mixin flex( $args ... ){
+  -webkit-flex: $args;
+  -ms-flex: $args;
+  flex: $args;
+}

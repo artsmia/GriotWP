@@ -9,8 +9,10 @@
  * 
  * modelChain maintains an array representing the chain of elements above the 
  * current field element, i.e. ['data', 'repeater1', '0', 'repeater2', '1', 
- * 'fieldname' ]. model converts modelChain into a reference to the proper
- * storage location in $scope.data. 
+ * 'fieldname' ] would refer to the fieldname in the second slide of a repeater
+ * that is nested in the first slide of another repeater which sits at the top
+ * level. model converts modelChain into a reference to the proper storage 
+ * location in $scope.data. 
  * 
  * NOTE: model in fact resolves to the level just above the field name, so 
  * that the directive template can define ng-model as 'model.fieldname' and 

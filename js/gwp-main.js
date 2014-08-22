@@ -18,11 +18,11 @@ jQuery( document ).ready( function() {
 
 		// Create main application container and hidden content field
 		.find( '#post-body-content' ).append( "<div id='griot'>" +
-					"<div media-drawer></div>" +
 					"<textarea name='content' id='griot-data'>{{ data | json }}</textarea>" +
 					"<fieldset>" +
 						"<field type='text' name='objectid' label='Object ID' />" +
 					"</fieldset>" +
+					"<div media-drawer></div>" +
 				"</div>" 
 		)
 

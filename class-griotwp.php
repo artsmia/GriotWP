@@ -435,7 +435,7 @@ class GriotWP{
 			wp_enqueue_script(
 				'gwp_js',
 				plugins_url( 'dist/gwp.js', __FILE__ ),
-				'angular',
+				array( 'angular', 'jquery', 'jquery-ui-core', 'jquery-ui-draggable', 'jquery-ui-droppable' ),
 				null,
 				true
 			);
