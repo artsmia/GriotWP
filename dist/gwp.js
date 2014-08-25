@@ -8,7 +8,12 @@ jQuery( document ).ready( function() {
 
 
 	// Prepare WP environment
-	jQuery( '#poststuff' )
+	jQuery( 'body' )
+
+		// Tell CSS this page is managed by Griot
+		.addClass( 'griot-post' )
+
+		.find( '#poststuff' )
 
 		// Define Angular app and controller
 		.attr({
@@ -959,7 +964,8 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 
 		restrict: 'A',
 		replace: true,
-		template: "<div class='griot-media-drawer' ng-class=\"{'visible':$root.mediaVisible}\" ng-click=''>" +
+		template: "<div class='griot-media-drawer' ng-class=\"{'visible':$root.mediaVisible}\">" +
+			"<a class='griot-media-toggle' ng-click='toggle()'></a>" +
 			"<div class='griot-media-controls'>" +
 				"<h2 class='griot-media-header'>Available Media</h2>" +
 				"<p class='griot-media-instructions'>Drag to the left panel to insert.</p>" +
@@ -979,10 +985,9 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 
 			$rootScope.mediaVisible = false;
 			$scope.media = [];
-
-			$scope.logStart = function(){
-				console.log('start');
-			};
+			$scope.toggle = function(){
+				$rootScope.mediaVisible = ! $rootScope.mediaVisible;
+			}
 
 			/**
 			 * Get the dev zoomables (soon to be the config) and arrange into a structure
@@ -2036,6 +2041,32 @@ L.extend( L.LatLngBounds.prototype, {
     ]);
 
   }
+
+});
+/**
+ * filterObjects filter
+ *
+ * Return array of zoomables from specified object, or if not specified, from
+ * ui.zoomables master array
+ */
+angular.module( 'griot' ).filter( 'filterObjects', function() {
+
+  return function( objects, ui, requestedID ) {
+
+  	if( ui.zoomables ) {
+
+	  	if( requestedID ) {
+	  		return ui.zoomables.objects[ requestedID ];
+	  	} else {
+	  		return ui.zoomables.all;
+	  	}
+
+	  }
+	  else {
+	  	console.log( 'WARNING: No config detected!' );
+	  }
+
+  };
 
 });
 /**

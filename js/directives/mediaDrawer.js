@@ -9,7 +9,8 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 
 		restrict: 'A',
 		replace: true,
-		template: "<div class='griot-media-drawer' ng-class=\"{'visible':$root.mediaVisible}\" ng-click=''>" +
+		template: "<div class='griot-media-drawer' ng-class=\"{'visible':$root.mediaVisible}\">" +
+			"<a class='griot-media-toggle' ng-click='toggle()'></a>" +
 			"<div class='griot-media-controls'>" +
 				"<h2 class='griot-media-header'>Available Media</h2>" +
 				"<p class='griot-media-instructions'>Drag to the left panel to insert.</p>" +
@@ -29,10 +30,9 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 
 			$rootScope.mediaVisible = false;
 			$scope.media = [];
-
-			$scope.logStart = function(){
-				console.log('start');
-			};
+			$scope.toggle = function(){
+				$rootScope.mediaVisible = ! $rootScope.mediaVisible;
+			}
 
 			/**
 			 * Get the dev zoomables (soon to be the config) and arrange into a structure

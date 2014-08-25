@@ -8,7 +8,12 @@ jQuery( document ).ready( function() {
 
 
 	// Prepare WP environment
-	jQuery( '#poststuff' )
+	jQuery( 'body' )
+
+		// Tell CSS this page is managed by Griot
+		.addClass( 'griot-post' )
+
+		.find( '#poststuff' )
 
 		// Define Angular app and controller
 		.attr({
