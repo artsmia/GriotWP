@@ -132,6 +132,8 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 					_this.watchForExternalDeletion();
 
+					$scope.$broadcast( 'zoomerBuilt' );
+
 				}
 			};
 
@@ -264,6 +266,13 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				return $scope.zoomer ? $scope.zoomer : null; 
 			};
 
+
+			/**
+			 * Retrieve the zoomer container ID
+			 */
+			this.getZoomerContainer = function() {
+				return $scope.hasOwnProperty( 'zoomer' ) ? $scope.zoomer.containerName : null;
+			};
 
 			/**
 			 * Retrieve the reference to the annotations repeater
