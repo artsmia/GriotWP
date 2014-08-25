@@ -26,37 +26,26 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 		"</div>",
 		controller: function( $scope, $element, $attrs ){
 
-			var devZoomables;
-
 			$rootScope.mediaVisible = false;
 			$scope.media = [];
 			$scope.toggle = function(){
 				$rootScope.mediaVisible = ! $rootScope.mediaVisible;
-			}
+			};
 
-			/**
-			 * Get the dev zoomables (soon to be the config) and arrange into a structure
-			 * that we can use in the media drawer.
-			 */
-			$http.get( 'http://author.loc/wp-content/plugins/GriotWP/tdx_rev.json' )
-				.success( function(data){
-					devZoomables = data;
-				})
-				.then( function(){
-					for( var objid in devZoomables ){
-						var images = devZoomables[ objid ].images;
-						var meta = devZoomables[ objid ].meta;
-						for( var i = 0; i < images.length; i++ ){
-							var image = images[i];
-							image.object_id = objid;
-							image.id = image.file.split('.tif')[0];
-							image.thumb = 'http://tiles.dx.artsmia.org/v2/' + image.file.split('.tif')[0] + '/0/0/0.png';
-							image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
-							image.object_title = meta.title;
-							$scope.media.push( image );
-						}
-					}
-				});
+			// Assemble media
+			for( var objid in $scope.ui.zoomables ){
+				var meta = $scope.ui.zoomables[ objid ].meta;
+				var images = $scope.ui.zoomables[ objid ].images;
+				for( var i = 0; i < images.length; i++ ){
+					var image = images[i];
+					image.object_id = objid;
+					image.id = image.file.split('.tif')[0];
+					image.thumb = $scope.ui.zoomables[ objid ].images[i].thumb = 'http://tiles.dx.artsmia.org/v2/' + image.file.split('.tif')[0] + '/0/0/0.png';
+					image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
+					image.object_title = meta.title;
+					$scope.media.push( image );
+				}
+			}
 		},
 		link: function( scope, elem, attrs ) {
 		}

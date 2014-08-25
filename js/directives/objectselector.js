@@ -4,7 +4,7 @@
  * Sets up a (non-isolate) scope and controller and prints fields needed to
  * add and annotate zoomable images.
  */
-angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $compile, $rootScope ) {
+angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $compile, $rootScope, $sce ) {
 
 	return {
 
@@ -12,9 +12,16 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 		replace:true,
 		template: function( elem, attrs ) {
 			var templateHtml = "<div class='griot-object-selector'>" +
-				"<div class='griot-object-selector-thumb' ng-class='{empty: isEmpty, isDroppable: isDroppable}' ng-style='{ backgroundImage: backgroundImage }'></div>" +
-				"<h2 class='griot-object-selector-title'>{{objectTitle}}</h2><br />" +
-				"<h3 class='griot-object-selector-id'>ID: {{objectID}}</h3>" +
+				"<div class='griot-object-selector-thumb' ng-class='{empty: isEmpty, isDroppable: isDroppable}' ng-style='{ backgroundImage: backgroundImage}'></div>" +
+				"<table ng-if='data.id' class='griot-object-selector-data' border='0' cellpadding='0' cellspacing='0'>" +
+					"<tr><td>Title</td><td>{{ui.zoomables[data.id].meta.title}}</td></tr>" +
+					"<tr><td>Accession No.</td><td>{{ui.zoomables[data.id].meta.accession_number}}</td></tr>" +
+					"<tr><td>Object ID</td><td>{{data.id}}</td></tr>" +
+					"<tr><td>Artist</td><td>{{ui.zoomables[data.id].meta.artist}}</td></tr>" +
+					"<tr><td>Dates</td><td>{{ui.zoomables[data.id].meta.dated}}</td></tr>" +
+					"<tr><td>Location</td><td>{{ui.zoomables[data.id].meta.country}}, {{ui.zoomables[data.id].meta.continent}}</td></tr>" +
+					"<tr><td>Medium</td><td>{{ui.zoomables[data.id].meta.medium}}</td></tr>" +
+				"</table>" +
 			"</div>";
 			return templateHtml;
 		},
@@ -24,19 +31,41 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 
 			$scope.isDroppable = false;
 			$scope.isEmpty = 'undefined' === typeof $scope.model[ $attrs.name ];
-			$scope.objectTitle = '';
-			$scope.objectID = $scope.model[ $attrs.name ];
-
-			$scope.updateView = function( helper ){
-				$scope.objectTitle = helper.data('object-title');
-				$scope.objectID = helper.data('object-id');
-				$scope.backgroundImage = 'url(' + helper.attr( 'src' ) + ')';
-				$scope.isEmpty = false;
-			};
+			$scope.backgroundImage = $scope.data.id ? 'url(' + $scope.ui.zoomables[ $scope.model[ $attrs.name ] ].images[0].thumb + ')': '';
 
 			$scope.openMediaDrawer = function(){
 				$rootScope.mediaVisible = true;
 			};
+
+			$scope.updateThumb = function( helper ){
+				$scope.backgroundImage = 'url(' + helper.attr('src') + ')';
+			};
+
+			$scope.autoUpdateMeta = function(){
+        var artist, 
+            culture, 
+            country, 
+            dated, 
+            medium, 
+            dimension, 
+            creditline, 
+            accession_number, 
+            trustedDescription;
+
+				artist = $scope.ui.zoomables[$scope.data.id].meta.artist || 'Artist unknown';
+        culture = $scope.ui.zoomables[$scope.data.id].meta.culture || '';
+        country = $scope.ui.zoomables[$scope.data.id].meta.country || '';
+        dated = $scope.ui.zoomables[$scope.data.id].meta.dated || '';
+        medium = $scope.ui.zoomables[$scope.data.id].meta.medium || '';
+        dimension = $scope.ui.zoomables[$scope.data.id].meta.dimension || '';
+        creditline = $scope.ui.zoomables[$scope.data.id].meta.creditline || '';
+        accession_number = $scope.ui.zoomables[$scope.data.id].meta.accession_number || '';
+        trustedDescription = $sce.trustAsHtml( $scope.ui.zoomables[$scope.data.id].meta.description );
+
+        $scope.data.meta1 = artist + ', ' + ( culture && culture + ', ' ) + country;
+        $scope.data.meta2 = dated;
+        $scope.data.meta3 = $sce.trustAsHtml( ( medium && medium + "\n" ) + ( dimension && dimension + "\n" ) + ( creditline && creditline + "\n" ) + accession_number );
+			}
 
 		},
 		link: function( scope, elem, attrs ) {
@@ -53,11 +82,6 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 
 				activate: function(e, ui){
 
-					// Same object; do nothing
-					if( ui.helper.data('object-id') == scope.model[ attrs.name ] ){
-						return;
-					}
-
 					scope.$apply( function(){
 						scope.isDroppable = true;
 					});
@@ -70,11 +94,6 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 				},
 				drop: function(e, ui){
 
-					// Same object; do nothing
-					if( ui.helper.data('object-id') == scope.model[ attrs.name ] ){
-						return;
-					}
-
 					scope.$apply( function(){
 
 						// Unhighlight
@@ -82,10 +101,11 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 
 						// Update
 						scope.model[ attrs.name ] = ui.helper.data('object-id').toString();
+						scope.updateThumb( ui.helper );
 
-						// Update VIEW (hacky - should just listen to model - will fix once
-						// remote config matches dev config)
-						scope.updateView( ui.helper );
+						if( ui.helper.data('object-id') !== scope.model[ attrs.name ] && confirm( 'Auto-update metadata?' ) ){
+							scope.autoUpdateMeta();
+						}
 
 					});
 				}

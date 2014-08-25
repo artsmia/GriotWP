@@ -18,7 +18,7 @@ angular.module( 'griot' ).directive( 'field', function() {
 
 			$scope.griotData = griotData;
 
-			$scope.protected = false;
+			$scope.protected = $attrs.hasOwnProperty( 'protected' );
 
 			$scope.toggleProtection = function() {
 				$scope.protected = ! $scope.protected;
@@ -146,7 +146,6 @@ angular.module( 'griot' ).directive( 'field', function() {
 
 				templatehtml += "<a class='griot-button' ng-if='protected' ng-click='toggleProtection()'>Unlock</a>" +
 					"<a class='griot-button' ng-if='!protected' ng-click='toggleProtection()'>Lock</a>";
-
 			}
 
 			templatehtml += "</div>" +

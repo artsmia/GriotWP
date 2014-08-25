@@ -47,14 +47,12 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				// Do nothing if zoomer exists and image ID has not changed
 				if( newImageID === $scope.imageID && 'undefined' !== typeof $scope.zoomer ) {
-					console.log( 'exiting, zoomer exists and ID has not changed.' );
 					return;
 				}
 
 				// Return if image ID is blank
 				if( ! newImageID ) { 
 					_this.destroyZoomer( true );
-					console.log( 'destroying, no ID' );
 					return;
 				}
 
@@ -71,13 +69,11 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 					_this.destroyZoomer( true );
 
 					// Setup and build
-					console.log( 'have data, setting up' );
 					_this.setupZoomer( false );
 
 				});
 				http.error( function( e ) {
 
-					console.log( 'Destroying, no tile data' );
 					_this.destroyZoomer( true );
 
 				});
@@ -104,9 +100,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				$scope.container_id = $element.find( '.griot-zoomer' ).first().attr( 'id' );
 
 				if( buildZoomer ){
-					console.log( 'buildZoomer is true' );
 					if( $scope.isVisible() ){
-							console.log( 'zoomer is visible, calling buildZoomer' );
 						$scope.buildZoomer();
 					}
 				}
@@ -114,8 +108,6 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			};
 
 			$scope.buildZoomer = function(){
-
-				console.log( 'in buildZoomer' );
 
 				$scope.imageLayers = L.featureGroup();
 
