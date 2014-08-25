@@ -1012,7 +1012,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
  * Sets up a (non-isolate) scope and controller and prints fields needed to
  * add and annotate zoomable images.
  */
-angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $compile, $rootScope, $sce ) {
+angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $compile, $rootScope ) {
 
 	return {
 
@@ -1021,15 +1021,18 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 		template: function( elem, attrs ) {
 			var templateHtml = "<div class='griot-object-selector'>" +
 				"<div class='griot-object-selector-thumb' ng-class='{empty: isEmpty, isDroppable: isDroppable}' ng-style='{ backgroundImage: backgroundImage}'></div>" +
-				"<table ng-if='data.id' class='griot-object-selector-data' border='0' cellpadding='0' cellspacing='0'>" +
-					"<tr><td>Title</td><td>{{ui.zoomables[data.id].meta.title}}</td></tr>" +
-					"<tr><td>Accession No.</td><td>{{ui.zoomables[data.id].meta.accession_number}}</td></tr>" +
-					"<tr><td>Object ID</td><td>{{data.id}}</td></tr>" +
-					"<tr><td>Artist</td><td>{{ui.zoomables[data.id].meta.artist}}</td></tr>" +
-					"<tr><td>Dates</td><td>{{ui.zoomables[data.id].meta.dated}}</td></tr>" +
-					"<tr><td>Location</td><td>{{ui.zoomables[data.id].meta.country}}, {{ui.zoomables[data.id].meta.continent}}</td></tr>" +
-					"<tr><td>Medium</td><td>{{ui.zoomables[data.id].meta.medium}}</td></tr>" +
-				"</table>" +
+				"<div class='griot-object-selector-data'>" +
+					"<p>Object data:</p>" +
+					"<table ng-if='data.id' border='0' cellpadding='0' cellspacing='0'>" +
+						"<tr><td>Title</td><td>{{ui.zoomables[data.id].meta.title}}</td></tr>" +
+						"<tr><td>Accession No.</td><td>{{ui.zoomables[data.id].meta.accession_number}}</td></tr>" +
+						"<tr><td>Object ID</td><td>{{data.id}}</td></tr>" +
+						//"<tr><td>Artist</td><td>{{ui.zoomables[data.id].meta.artist}}</td></tr>" +
+						//"<tr><td>Dates</td><td>{{ui.zoomables[data.id].meta.dated}}</td></tr>" +
+						//"<tr><td>Location</td><td>{{ui.zoomables[data.id].meta.country}}, {{ui.zoomables[data.id].meta.continent}}</td></tr>" +
+						//"<tr><td>Medium</td><td>{{ui.zoomables[data.id].meta.medium}}</td></tr>" +
+					"</table>" +
+				"</div>" +
 			"</div>";
 			return templateHtml;
 		},
@@ -1068,12 +1071,12 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
         dimension = $scope.ui.zoomables[$scope.data.id].meta.dimension || '';
         creditline = $scope.ui.zoomables[$scope.data.id].meta.creditline || '';
         accession_number = $scope.ui.zoomables[$scope.data.id].meta.accession_number || '';
-        trustedDescription = $sce.trustAsHtml( $scope.ui.zoomables[$scope.data.id].meta.description );
+        trustedDescription = $scope.ui.zoomables[$scope.data.id].meta.description;
 
         $scope.data.meta1 = artist + ', ' + ( culture && culture + ', ' ) + country;
         $scope.data.meta2 = dated;
-        $scope.data.meta3 = $sce.trustAsHtml( ( medium && medium + "\n" ) + ( dimension && dimension + "\n" ) + ( creditline && creditline + "\n" ) + accession_number );
-			}
+        $scope.data.meta3 = ( medium && medium + "\n" ) + ( dimension && dimension + "\n" ) + ( creditline && creditline + "\n" ) + accession_number;
+			};
 
 		},
 		link: function( scope, elem, attrs ) {
@@ -1104,6 +1107,8 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 
 					scope.$apply( function(){
 
+						var oldID = scope.data.id;
+
 						// Unhighlight
 						scope.isDroppable = false;
 
@@ -1111,7 +1116,7 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 						scope.model[ attrs.name ] = ui.helper.data('object-id').toString();
 						scope.updateThumb( ui.helper );
 
-						if( ui.helper.data('object-id') !== scope.model[ attrs.name ] && confirm( 'Auto-update metadata?' ) ){
+						if( ui.helper.data('object-id').toString() !== oldID && confirm( 'Auto-update metadata?' ) ){
 							scope.autoUpdateMeta();
 						}
 
