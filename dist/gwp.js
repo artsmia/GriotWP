@@ -136,24 +136,22 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 		recordList: griotData.recordList,
 		tileServer: griotData.tileServer,
 		zoomables: griotData.config,
-		objects: []
-	};
-
-	if( griotData.config ) {
-
-		for( var objectid in griotData.config ) {
-
-			if( 'null' === objectid || '_empty_' === objectid ) {
-				continue;
-			}
-
-			$scope.ui.objects.push( objectid );
-
-		}
-
+		media: []
 	}
-	else {
-		console.log( 'WARNING: No config detected!' );
+	
+	// Assemble media
+	for( var objid in $scope.ui.zoomables ){
+		var meta = $scope.ui.zoomables[ objid ].meta;
+		var images = $scope.ui.zoomables[ objid ].images;
+		for( var i = 0; i < images.length; i++ ){
+			var image = images[i];
+			image.object_id = objid;
+			image.id = image.file.split('.tif')[0];
+			image.thumb = $scope.ui.zoomables[ objid ].images[i].thumb = 'http://tiles.dx.artsmia.org/v2/' + image.file.split('.tif')[0] + '/0/0/0.png';
+			image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
+			image.object_title = meta.title;
+			$scope.ui.media.push( image );
+		}
 	}
 
 });
@@ -969,33 +967,17 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 				"<label class='griot-media-label' for='griot-media-filter-by-object'>Current object media only</label>" +
 			"</div>" +
 			"<div class='griot-media-window'>" +
-				"<div class='griot-media-thumb' ng-repeat='image in media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:20' >" +
-					"<img class='griot-media-image' ng-src='{{image.thumb}}' data-object-id='{{image.object_id}}' data-image-id='{{image.id}}' data-object-title='{{image.object_title}}' media-drag />" +
+				"<div class='griot-media-thumb' ng-repeat='image in ui.media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:20' >" +
+					"<img class='griot-media-image' ng-src='{{image.thumb}}' data-object-id='{{image.object_id}}' data-image-id='{{image.id}}' data-object-title='{{image.object_title}}' data-image-approved='{{image.approved}}' media-drag />" +
 				"</div>" +
 			"</div>" +
 		"</div>",
 		controller: function( $scope, $element, $attrs ){
 
 			$rootScope.mediaVisible = false;
-			$scope.media = [];
 			$scope.toggle = function(){
 				$rootScope.mediaVisible = ! $rootScope.mediaVisible;
 			};
-
-			// Assemble media
-			for( var objid in $scope.ui.zoomables ){
-				var meta = $scope.ui.zoomables[ objid ].meta;
-				var images = $scope.ui.zoomables[ objid ].images;
-				for( var i = 0; i < images.length; i++ ){
-					var image = images[i];
-					image.object_id = objid;
-					image.id = image.file.split('.tif')[0];
-					image.thumb = $scope.ui.zoomables[ objid ].images[i].thumb = 'http://tiles.dx.artsmia.org/v2/' + image.file.split('.tif')[0] + '/0/0/0.png';
-					image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
-					image.object_title = meta.title;
-					$scope.media.push( image );
-				}
-			}
 		},
 		link: function( scope, elem, attrs ) {
 		}
@@ -1745,6 +1727,17 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				$scope.imageID = $scope.model[ $attrs.name ];
 
+				// Get FPO status; default to false
+				$scope.imageApproved = false;
+				var image;
+				for( var i = 0; i < $scope.ui.media.length; i++ ){
+					image = $scope.ui.media[ i ];
+					if( image.id === $scope.imageID ){
+						$scope.imageApproved = image.approved;
+						break;
+					}
+				}
+
 				$scope.tilesURL = $scope.tileData.tiles[0];
 
 				// Get container ID
@@ -1779,7 +1772,9 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				if( $scope.hasAnnotations ) {
 
-					_this.addDrawingControls();
+					if( ! $scope.fpo ){
+						_this.addDrawingControls();
+					}
 
 					_this.watchForExternalDeletion();
 

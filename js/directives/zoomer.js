@@ -88,6 +88,17 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				$scope.imageID = $scope.model[ $attrs.name ];
 
+				// Get FPO status; default to false
+				$scope.imageApproved = false;
+				var image;
+				for( var i = 0; i < $scope.ui.media.length; i++ ){
+					image = $scope.ui.media[ i ];
+					if( image.id === $scope.imageID ){
+						$scope.imageApproved = image.approved;
+						break;
+					}
+				}
+
 				$scope.tilesURL = $scope.tileData.tiles[0];
 
 				// Get container ID
@@ -122,7 +133,9 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				if( $scope.hasAnnotations ) {
 
-					_this.addDrawingControls();
+					if( ! $scope.fpo ){
+						_this.addDrawingControls();
+					}
 
 					_this.watchForExternalDeletion();
 

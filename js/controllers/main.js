@@ -18,24 +18,22 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 		recordList: griotData.recordList,
 		tileServer: griotData.tileServer,
 		zoomables: griotData.config,
-		objects: []
-	};
-
-	if( griotData.config ) {
-
-		for( var objectid in griotData.config ) {
-
-			if( 'null' === objectid || '_empty_' === objectid ) {
-				continue;
-			}
-
-			$scope.ui.objects.push( objectid );
-
-		}
-
+		media: []
 	}
-	else {
-		console.log( 'WARNING: No config detected!' );
+	
+	// Assemble media
+	for( var objid in $scope.ui.zoomables ){
+		var meta = $scope.ui.zoomables[ objid ].meta;
+		var images = $scope.ui.zoomables[ objid ].images;
+		for( var i = 0; i < images.length; i++ ){
+			var image = images[i];
+			image.object_id = objid;
+			image.id = image.file.split('.tif')[0];
+			image.thumb = $scope.ui.zoomables[ objid ].images[i].thumb = 'http://tiles.dx.artsmia.org/v2/' + image.file.split('.tif')[0] + '/0/0/0.png';
+			image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
+			image.object_title = meta.title;
+			$scope.ui.media.push( image );
+		}
 	}
 
 });
