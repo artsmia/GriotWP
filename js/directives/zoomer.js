@@ -61,7 +61,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				// Get tile data if it exists and build or destroy zoomer accordingly
 				var http = $http.get( $scope.tilejson );
-				http.success( function( tileData ) { 
+				http.success( function( tileData ) {
 
 					$scope.tileData = tileData;
 
@@ -69,7 +69,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 					_this.destroyZoomer( true );
 
 					// Setup and build
-					_this.setupZoomer( false );
+					_this.setupZoomer();
 
 				});
 				http.error( function( e ) {
@@ -84,11 +84,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			/**
 			 * Build zoomer
 			 */
-			this.setupZoomer = function( buildZoomer ) {
-
-				if( 'undefined' === typeof buildZoomer ){
-					buildZoomer = false;
-				}
+			this.setupZoomer = function() {
 
 				$scope.imageID = $scope.model[ $attrs.name ];
 
@@ -99,10 +95,8 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 				// not have been interpolated by Angular yet
 				$scope.container_id = $element.find( '.griot-zoomer' ).first().attr( 'id' );
 
-				if( buildZoomer ){
-					if( $scope.isVisible() ){
-						$scope.buildZoomer();
-					}
+				if( $scope.isVisible() ){
+					$scope.buildZoomer();
 				}
 
 			};

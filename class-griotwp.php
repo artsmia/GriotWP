@@ -487,17 +487,17 @@ class GriotWP{
 
 		$griotData = array(
 
-			'recordType'  => $screen_id,
-			'templateUrl' => $this->templates[ $screen_id ],
-			'postID'      => $post->ID,
-			'title'       => $post->post_title,
-			'data'        => $post->post_content,
-			'recordList'  => get_option( 'griot_record_list' ),
-			'imageSrc'    => get_option( 'griot_image_source', 'wordpress' ),
-			'imageList'   => $imageList,
-			'tileServer'  => $tile_server,
-			'config'      => json_decode( $this->get_config( $config_url ) )
-
+			'recordType'      => $screen_id,
+			'templateUrl'     => $this->templates[ $screen_id ],
+			'postID'          => $post->ID,
+			'title'           => $post->post_title,
+			'data'            => $post->post_content,
+			'recordList'      => get_option( 'griot_record_list' ),
+			'imageSrc'        => get_option( 'griot_image_source', 'wordpress' ),
+			'imageList'       => $imageList,
+			'tileServer'      => $tile_server,
+			'config'          => json_decode( $this->get_config( $config_url ) ),
+			'trackMediaNonce' => wp_create_nonce( 'track_media_for_user_' . get_current_user_id() ),
 		);
 
 		wp_localize_script(
@@ -551,6 +551,53 @@ class GriotWP{
 
 		<?php
 	}
+
+
+	/**
+	 * Register metabox for related posts field
+	 *
+	 * @since 0.0.1
+	 */
+	function register_track_media_metabox() {
+
+		$screen = get_current_screen();
+		$edit_screens = array( 'object', 'story', 'panel' );
+		if( ! in_array( $screen->id, $edit_screens ) ) {
+			return;
+		}
+
+		// Add meta box
+		add_meta_box(
+			'griot-track-media',
+			 __( 'Track Media', 'griot' ),
+			array( $this, 'render_track_media_metabox' ),
+			$screen->id,
+			'side'
+		);
+
+	}
+
+
+	/**
+	 * Callback that prints Angular template to related records metabox.
+	 *
+	 * @since 0.0.1
+	 */
+	function render_track_media_metabox() {
+
+		global $post;
+
+		$screen = get_current_screen();
+		$tracked_posts = get_user_meta( get_current_user_id(), 'gwp_tracked_posts', true );
+		$checked = in_array( $post->ID, $tracked_posts ) ? 'checked' : '';
+		?>
+
+		<input track-media type='checkbox' id='griot-toggle-track-media' <?php echo $checked; ?> />
+		<label for='griot-toggle-track-media'>Track the status of zoomable images attached to this <?php echo $screen->id; ?> on my dashboard.</label>
+		<span class='griot-track-media-saved'>Saved</span>
+
+		<?php
+	}	
 
 
 	/**
@@ -772,6 +819,59 @@ class GriotWP{
 
 
 	/**
+	 * Update user media tracking (AJAX callback)
+	 */
+	function update_media_tracking(){
+
+		check_admin_referer( 'track_media_for_user_' . get_current_user_id() );
+
+		$post_id = $_POST[ 'track_id' ];
+		$status = $_POST[ 'track_status' ];
+		$user_id = get_current_user_id();
+		$result = false;
+
+		$tracked_posts = get_user_meta( $user_id, 'gwp_tracked_posts', true );
+		if( ! is_array( $tracked_posts ) ){
+			$tracked_posts = array();
+		}
+
+		$in_array = in_array( $post_id, $tracked_posts );
+
+		switch( $status ){
+			case 'untrack':
+
+				if( ! $in_array ){
+					$result = true;
+					break;
+				}
+
+				$index = array_search( $post_id, $tracked_posts );
+				array_splice( $tracked_posts, $index );
+				$result = update_user_meta( $user_id, 'gwp_tracked_posts', $tracked_posts );
+
+				break;
+
+			case 'track':
+
+				if( $in_array ){
+					$result = true;
+					break;
+				}
+
+				array_push( $tracked_posts, $post_id );
+				$result = update_user_meta( $user_id, 'gwp_tracked_posts', $tracked_posts );
+
+				break;
+		}
+
+		echo $result === false ? 'error' : 'success';
+
+		die;
+
+	}
+
+
+	/**
 	 * Set up plugin
 	 * 
 	 * @since 0.0.1
@@ -800,6 +900,7 @@ class GriotWP{
 
 		// Add related records metabox
 		add_action( 'add_meta_boxes', array( $this, 'register_related_records_metabox' ) );
+		add_action( 'add_meta_boxes', array( $this, 'register_track_media_metabox' ) );
 
 		// Add settings page and settings
 		add_action( 'admin_menu', array( $this, 'register_settings_page' ) );
@@ -807,6 +908,7 @@ class GriotWP{
 
 		// Add config callback for settings page
 		add_action( 'wp_ajax_griot_get_config', array( $this, 'check_config' ) );
+		add_action( 'wp_ajax_griot_track_media', array( $this, 'update_media_tracking' ) );
  
 	}
 
