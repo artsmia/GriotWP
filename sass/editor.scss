@@ -15,7 +15,14 @@
 	margin-bottom:25px;
 }
 .griot-field-wrap{
-	margin-top:20px;
+	padding:20px 0;
+	border-top:1px solid #fff;
+	border-bottom:1px solid #ccc;
+
+	.griot-repeater &{
+		padding:10px 0;
+		border:none;
+	}
 }
 .griot-field input[type='text'],
 .griot-field textarea,
@@ -103,7 +110,7 @@
  * -------------------------------------------------------------------------- */
 
 #griot-track-media{
-	min-height:130px;
+	min-height:110px;
 
 	input[type='checkbox']{
 		float:left;
@@ -120,6 +127,70 @@
 	color:#006400;
 }
 
+
+/* -------------------------------------------------------------------------- *
+ * TRACK MEDIA DASHBOARD WIDGET
+ * -------------------------------------------------------------------------- */
+
+#gwp_track_media_widget .inside{
+	background-color:#ccc;
+	margin-top:0;
+	max-height:300px;
+	overflow:scroll;
+	-webkit-overflow-scrolling:touch;
+}
+.griot-tracker-item{
+	@include box-shadow(0 3px 3px rgba(0,0,0,0.13) );
+	background-color:#fff;
+	margin:10px 0;
+	padding:10px;
+	border:1px solid #ccc;
+
+	&:last-child{
+		margin-bottom:0;
+	}
+}
+.griot-tracker-title{
+	font-weight:bold;
+	border-bottom:1px solid #ccc;
+	margin:0;
+	font-size:1.2em;
+}
+.griot-tracker-list{
+	list-style:none;
+	margin:0;
+}
+.griot-tracker-list-item{
+	padding:10px 0;
+	margin:0;
+	border-bottom:1px dotted #ccc;
+	
+	&:last-child{
+		border:none;
+	}
+
+	&:after{
+		display:block;
+		float:right;
+		content:' ';
+		width:10px;
+		height:10px;
+		border-radius:7px;
+		margin:5px 5px 0 0;
+	}
+
+	&.griot-fpo:after{
+		@include box-shadow( 0 0 3px orange );
+		background-color:orange;
+	}
+
+	&.griot-final:after{
+		@include box-shadow( 0 0 3px green );
+		background-color:green;
+	}
+}
+
+
 /* -------------------------------------------------------------------------- *
  * MEDIA DRAWER
  * -------------------------------------------------------------------------- */
@@ -131,14 +202,15 @@
 	@include displayFlex( column, nowrap );
 	position:fixed;
 	top:32px;
-	right:-320px;
-	width:360px;
+	right:-280px;
+	width:340px;
 	height:100%;
 	padding:0 20px 32px 60px;
 	background-color:#222;
 	z-index:2;
 
 	&.visible{
+		@include box-shadow( 0 -3px 6px rgba(0,0,0,0.4) );
 		right:0;
 	}
 }
@@ -248,13 +320,13 @@
 	}
 }
 .griot-repeater-header{
-	@include box-shadow( 0 2px 4px rgba(0,0,0,0.13) );
 	height:30px;
 	width:100%;
 	position:relative;
 	z-index:2;
 	box-sizing:border-box;
 	border-top:1px solid #ccc;
+	border-bottom:1px solid #ccc;
 }
 .griot-repeater-nav{
 	position:absolute;
@@ -310,13 +382,11 @@
 	}
 }
 .griot-repeater-container{
-	@include box-shadow(inset 0 0 6px rgba(0,0,0,0.13) );
 	position:relative;
 	width:100%;
 	background-color:#ccc;
 }
 .griot-repeater-item{
-	@include box-shadow(inset 0 0 8px rgba(0,0,0,0.13) );
 	@include box-sizing( border-box );
 	position:relative;
 	width:100%;
@@ -429,6 +499,8 @@
 }
 
 
+
+
 /* -------------------------------------------------------------------------- *
  * CONNECTIONS
  * -------------------------------------------------------------------------- */
@@ -445,35 +517,7 @@
 
 .griot-object-selector{
 	position:relative;
-	min-height:175px;
-}
-.griot-object-selector-thumb{
-	position:absolute;
-	top:0;
-	left:0;
-	width:150px;
-	height:150px;
-	border:1px solid #ccc;
-	background-color:#fff;
-	background-size:contain;
-	background-position:center center;
-	background-repeat:no-repeat;
-
-	&.empty{
-		@include placeholderBg;
-		text-align:center;
-		line-height:150px;
-		vertical-align:middle;
-		text-transform:uppercase;
-		font-size:12px;
-		font-weight:bold;
-		color:#666;
-
-		&:after{
-			content:'No object selected';
-		}
-	}
-
+	
 	&.isDroppable:after{
 		position:absolute;
 		top:0;
@@ -485,8 +529,7 @@
 	}
 }
 .griot-object-selector-data{
-	@include box-shadow( inset 0 0 5px rgba(0,0,0,0.25) );
-	margin-left:175px;
+	@include box-shadow( inset 0 0 8px rgba(0,0,0,0.25) );
 	font-family:'Andale', 'Courier', monospace;
 	border:1px solid #ccc;
 
@@ -523,10 +566,12 @@
  * -------------------------------------------------------------------------- */
 
 .griot-zoomer{
+	@include box-shadow( inset 0 0 8px rgba(0,0,0,0.25) );
 	@include transition( border-color 300ms ease );
 	position:relative; // For "isDroppable" overlay
 	width:100%;
 	height:500px;
+	border:1px solid #ccc;
 
 	&.noAnnotations{
 		display:inline-block;
@@ -544,6 +589,55 @@
 		background-color:rgba(0,0,0,0.5);
 		content:'';
 	}
+}
+.griot-zoomer-status{
+	font-size:0.9em;
+	padding:5px 10px;
+	margin:0;
+	font-style:italic;
+}
+.griot-zoomer-status-label{
+	font-size:1em;
+	text-transform:uppercase;
+	font-weight:bold;
+	font-style:normal;
+
+	&:before{
+		display:inline-block;
+		content:' ';
+		width:10px;
+		height:10px;
+		border-radius:7px;
+		margin-right:5px;
+	}
+
+	.griot-zoomer-status-final &{
+		color:green;
+
+		&:before{
+			@include box-shadow( 0 0 3px green );
+			background-color:green;
+		}
+	}
+
+	.griot-zoomer-status-fpo &{
+		color:orange;
+
+		&:before{
+			@include box-shadow( 0 0 3px orange );
+			background-color:orange;
+		}
+
+	}
+}
+.griot-zoomer-notice{
+	position:relative;
+	top:50%;
+	margin:-8px auto 0;
+	text-transform:uppercase;
+	font-weight:bold;
+	color:#999;
+	text-align:center;
 }
 
 
@@ -570,7 +664,7 @@
 		text-transform:uppercase;
 		font-size:12px;
 		font-weight:bold;
-		color:#666;
+		color:#999;
 
 		&:after{
 			content:'No image selected';

@@ -328,8 +328,8 @@ class GriotWP{
 		}
 
 		// Editing screens managed by GriotWP
-		$edit_screens = array( 'object', 'story', 'panel' );
-		if( in_array( $screen->id, $edit_screens ) ) {
+		$controlled_screens = array( 'object', 'story', 'panel' );
+		if( in_array( $screen->id, $controlled_screens ) ) {
 
 			// Angular
 			wp_enqueue_script( 
@@ -426,12 +426,6 @@ class GriotWP{
 				true
 			);
 
-			// Griot
-			wp_enqueue_style(
-				'gwp_css',
-				plugins_url( 'css/gwp.css', __FILE__ ),
-				false
-			);
 			wp_enqueue_script(
 				'gwp_js',
 				plugins_url( 'dist/gwp.js', __FILE__ ),
@@ -446,6 +440,19 @@ class GriotWP{
 
 			// Print application data
 			$this->print_data( $screen->id );
+
+		}
+
+		// Dashboard needs to be styled, but we don't want to include the JS.
+		$styled_screens = array( 'object', 'story', 'panel', 'dashboard' );
+		if( in_array( $screen->id, $styled_screens ) ) {
+
+			// Griot
+			wp_enqueue_style(
+				'gwp_css',
+				plugins_url( 'css/gwp.css', __FILE__ ),
+				false
+			);
 
 		}
 
@@ -561,7 +568,7 @@ class GriotWP{
 	function register_track_media_metabox() {
 
 		$screen = get_current_screen();
-		$edit_screens = array( 'object', 'story', 'panel' );
+		$edit_screens = array( 'object' );
 		if( ! in_array( $screen->id, $edit_screens ) ) {
 			return;
 		}
@@ -589,15 +596,155 @@ class GriotWP{
 
 		$screen = get_current_screen();
 		$tracked_posts = get_user_meta( get_current_user_id(), 'gwp_tracked_posts', true );
-		$checked = in_array( $post->ID, $tracked_posts ) ? 'checked' : '';
+		$checked = is_array( $tracked_posts ) && in_array( $post->ID, $tracked_posts ) ? 'checked' : '';
 		?>
 
 		<input track-media type='checkbox' id='griot-toggle-track-media' <?php echo $checked; ?> />
-		<label for='griot-toggle-track-media'>Track the status of zoomable images attached to this <?php echo $screen->id; ?> on my dashboard.</label>
+		<label for='griot-toggle-track-media'>Track "View" images on dashboard</label>
 		<span class='griot-track-media-saved'>Saved</span>
 
 		<?php
 	}	
+
+
+		/**
+	 * Register media tracker dashboard widget
+	 *
+	 * @since 0.0.1
+	 */
+	function register_track_media_widget() {
+		wp_add_dashboard_widget(
+			'gwp_track_media_widget',
+			'Manage Media',
+			array( $this, 'render_track_media_widget' )
+		);	
+	}
+
+
+	/**
+	 * Render media tracker dashboard widget
+	 *
+	 * @since 0.0.1
+	 */
+	function render_track_media_widget(){
+
+		global $wpdb;
+
+		$screen = get_current_screen();
+
+		$tracked_posts = get_user_meta( get_current_user_id(), 'gwp_tracked_posts', true );
+
+		if( ! is_array( $tracked_posts ) || empty( $tracked_posts ) ){
+			echo "No tracked media found.";
+			return;
+		}
+
+		foreach( $tracked_posts as $post_id ){
+			$table = $wpdb->prefix . 'gwp_media_status';
+			$images = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT * FROM ' . $table . ' WHERE post_id = %d',
+					$post_id
+				),
+				ARRAY_A
+			);
+			?>
+
+			<div class='griot-tracker-item'>
+				<p class='griot-tracker-title'>
+					<a href='<?php echo get_edit_post_link( $post_id ); ?>'><?php echo get_the_title( $post_id ); ?></a>
+				</p>
+				<ul class='griot-tracker-list'>
+
+					<?php
+					foreach( $images as $image ){
+						$class = $image['status'] == 'final' ? 'griot-final' : 'griot-fpo';
+						?>
+
+						<li class='griot-tracker-list-item <?php echo $class; ?>'><?php echo $image['media']; ?></li>
+
+						<?php
+					}
+					if( empty( $images ) ){
+						echo "<li class='griot-tracker-list-item'>No tracked media found.</li>";
+					}
+					?>
+
+				</ul>
+			</div>
+
+			<?php				
+		}
+	}
+
+
+	/**
+	 * Check post content for zoomable images.
+	 *
+	 * @since 0.0.1
+	 */
+	function check_post_media( $post_id ){
+
+		global $wpdb;
+
+		if( ! array_key_exists( 'content', $_POST )
+			|| ! array_key_exists( 'post_type', $_POST )
+			|| $_POST['post_type'] != 'object'
+			|| wp_is_post_revision( $post_id ) 
+			|| wp_is_post_autosave( $post_id ) ){
+			return;
+		}
+
+		$image_ids = array();
+
+		$content_json = stripslashes( $_POST['content'] );
+		$content = json_decode( $content_json, true );
+		if( array_key_exists( 'views', $content ) ){
+			foreach( $content['views'] as $view ){
+				if( ! in_array( $view['image'], $image_ids ) ){
+					array_push( $image_ids, $view['image'] );
+				}
+			}
+		}
+
+		$image_list = array();
+
+		$config_json = $this->get_config();
+		$config = json_decode( $config_json, true );
+
+		foreach( $config as $object ){
+			foreach( $object['images'] as $image ){
+				$image_id = str_replace( '.tif', '', $image['file'] );
+				$image_list[ $image_id ] = $image['approved'];
+			}
+		}
+
+		// Clear out old image records for this post
+		$wpdb->delete( 
+			$wpdb->prefix . 'gwp_media_status', 
+			array( 
+				'post_id' => $post_id 
+			)
+		);
+
+		// Add new image records for this post
+		foreach( $image_ids as $image_id ){
+			$status = $image_list[ $image_id ] == 1 ? 'final' : 'fpo';
+			$wpdb->insert( 
+				$wpdb->prefix . 'gwp_media_status', 
+				array(
+					'post_id' => $post_id,
+					'media' => $image_id,
+					'status' => $status,
+					),
+				array(
+					'%d',
+					'%s',
+					'%s',
+				)
+			);
+		}
+	}
 
 
 	/**
@@ -774,10 +921,15 @@ class GriotWP{
 	 * Get config JSON from remote server
 	 *
 	 * @since 0.0.1
-	 * @param string $config_url The URL from which to retrieve the config json
+	 * @param string $config_url The URL from which to retrieve the config json.
+	 * Defaults to the stored config url value.
 	 * @return string The config data in JSON format
 	 */
-	function get_config( $config_url ) {
+	function get_config( $config_url=null ) {
+
+		if( ! $config_url ){
+			$config_url = get_option( 'griot_config_url' );
+		}
 
 		$ch = curl_init( $config_url );
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
@@ -898,9 +1050,15 @@ class GriotWP{
 		// If this page is managed by the plugin, enqueue scripts and styles
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts_and_styles' ) );
 
-		// Add related records metabox
+		// Add metaboxes
 		add_action( 'add_meta_boxes', array( $this, 'register_related_records_metabox' ) );
 		add_action( 'add_meta_boxes', array( $this, 'register_track_media_metabox' ) );
+
+		// Add dashboard widget
+		add_action( 'wp_dashboard_setup', array( $this, 'register_track_media_widget' ) );
+
+		// Add save post callback to check for zoomable media
+		add_action( 'save_post', array( $this, 'check_post_media' ) );
 
 		// Add settings page and settings
 		add_action( 'admin_menu', array( $this, 'register_settings_page' ) );
@@ -909,7 +1067,7 @@ class GriotWP{
 		// Add config callback for settings page
 		add_action( 'wp_ajax_griot_get_config', array( $this, 'check_config' ) );
 		add_action( 'wp_ajax_griot_track_media', array( $this, 'update_media_tracking' ) );
- 
+
 	}
 
 }

@@ -16,7 +16,11 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			attrs.hasAnnotations = transcrude ? true : false;
 
 			var templateHtml = "<div class='griot-annotated-image'>" +
-				"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$id}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations, isDroppable: isDroppable }' />";
+			"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$id}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations, isDroppable: isDroppable }'>"+
+				"<p ng-if='!imageID' class='griot-zoomer-notice'>No image selected</p>" +
+			"</div>" +
+			"<p class='griot-zoomer-status griot-zoomer-status-final' ng-if='imageID && imageApproved'><span class='griot-zoomer-status-label'>Final</span> This image has been approved by Visual Resources.</p>" +
+			"<p class='griot-zoomer-status griot-zoomer-status-fpo' ng-if='imageID && !imageApproved'><span class='griot-zoomer-status-label'>Temporary</span> This image may be used as a placeholder, but is likely to change.</p>";
 
 			if( transcrude ) {
 
@@ -133,7 +137,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				if( $scope.hasAnnotations ) {
 
-					if( ! $scope.fpo ){
+					if( $scope.imageApproved ){
 						_this.addDrawingControls();
 					}
 

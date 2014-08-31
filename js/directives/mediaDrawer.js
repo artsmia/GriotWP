@@ -19,12 +19,15 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 				"<label class='griot-media-label' for='griot-media-filter-by-object'>Current object media only</label>" +
 			"</div>" +
 			"<div class='griot-media-window'>" +
-				"<div class='griot-media-thumb' ng-repeat='image in ui.media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:20' >" +
+				"<div class='griot-media-thumb' ng-repeat='image in ui.media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:quantity' >" +
 					"<img class='griot-media-image' ng-src='{{image.thumb}}' data-object-id='{{image.object_id}}' data-image-id='{{image.id}}' data-object-title='{{image.object_title}}' data-image-approved='{{image.approved}}' media-drag />" +
 				"</div>" +
 			"</div>" +
 		"</div>",
 		controller: function( $scope, $element, $attrs ){
+
+			// Show this many images at once
+			$scope.quantity = 50;
 
 			$rootScope.mediaVisible = false;
 			$scope.toggle = function(){

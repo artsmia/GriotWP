@@ -137,7 +137,7 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 		tileServer: griotData.tileServer,
 		zoomables: griotData.config,
 		media: []
-	}
+	};
 	
 	// Assemble media
 	for( var objid in $scope.ui.zoomables ){
@@ -967,12 +967,15 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 				"<label class='griot-media-label' for='griot-media-filter-by-object'>Current object media only</label>" +
 			"</div>" +
 			"<div class='griot-media-window'>" +
-				"<div class='griot-media-thumb' ng-repeat='image in ui.media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:20' >" +
+				"<div class='griot-media-thumb' ng-repeat='image in ui.media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:quantity' >" +
 					"<img class='griot-media-image' ng-src='{{image.thumb}}' data-object-id='{{image.object_id}}' data-image-id='{{image.id}}' data-object-title='{{image.object_title}}' data-image-approved='{{image.approved}}' media-drag />" +
 				"</div>" +
 			"</div>" +
 		"</div>",
 		controller: function( $scope, $element, $attrs ){
+
+			// Show this many images at once
+			$scope.quantity = 50;
 
 			$rootScope.mediaVisible = false;
 			$scope.toggle = function(){
@@ -997,18 +1000,17 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 		restrict: 'E',
 		replace:true,
 		template: function( elem, attrs ) {
-			var templateHtml = "<div class='griot-object-selector'>" +
-				"<div class='griot-object-selector-thumb' ng-class='{empty: isEmpty, isDroppable: isDroppable}' ng-style='{ backgroundImage: backgroundImage}'></div>" +
+			var templateHtml = "<div class='griot-object-selector' ng-class='{isDroppable: isDroppable}'>" +
 				"<div class='griot-object-selector-data'>" +
-					"<p>Object data:</p>" +
+					"<p ng-if='data.id'>{{ui.zoomables[data.id].meta.title}}</p>" +
+					"<p ng-if='!data.id'>No object selected</p>" +
 					"<table ng-if='data.id' border='0' cellpadding='0' cellspacing='0'>" +
-						"<tr><td>Title</td><td>{{ui.zoomables[data.id].meta.title}}</td></tr>" +
 						"<tr><td>Accession No.</td><td>{{ui.zoomables[data.id].meta.accession_number}}</td></tr>" +
 						"<tr><td>Object ID</td><td>{{data.id}}</td></tr>" +
-						//"<tr><td>Artist</td><td>{{ui.zoomables[data.id].meta.artist}}</td></tr>" +
-						//"<tr><td>Dates</td><td>{{ui.zoomables[data.id].meta.dated}}</td></tr>" +
-						//"<tr><td>Location</td><td>{{ui.zoomables[data.id].meta.country}}, {{ui.zoomables[data.id].meta.continent}}</td></tr>" +
-						//"<tr><td>Medium</td><td>{{ui.zoomables[data.id].meta.medium}}</td></tr>" +
+						"<tr><td>Artist</td><td>{{ui.zoomables[data.id].meta.artist}}</td></tr>" +
+						"<tr><td>Dates</td><td>{{ui.zoomables[data.id].meta.dated}}</td></tr>" +
+						"<tr><td>Location</td><td>{{ui.zoomables[data.id].meta.country}}, {{ui.zoomables[data.id].meta.continent}}</td></tr>" +
+						"<tr><td>Medium</td><td>{{ui.zoomables[data.id].meta.medium}}</td></tr>" +
 					"</table>" +
 				"</div>" +
 			"</div>";
@@ -1056,27 +1058,34 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
         $scope.data.meta3 = ( medium && medium + "\n" ) + ( dimension && dimension + "\n" ) + ( creditline && creditline + "\n" ) + accession_number;
 			};
 
+			$scope.removeObject = function(){
+				$scope.data.id = null;
+				if( ( $scope.data.meta1 || $scope.data.meta2 || $scope.data.meta3 ) && confirm( 'Would you like to clear the meta fields as well?' ) ){
+					$scope.data.meta1 = $scope.data.meta2 = $scope.data.meta3 = null;
+				}
+			};
+
 		},
 		link: function( scope, elem, attrs ) {
 
 			// Add button
-			var addBtn = angular.element( "<a class='griot-button griot-pick-object' ng-disabled='protected' ng-click='openMediaDrawer()' ng-if='isEmpty'>Choose object</a>" +
-				"<a class='griot-button griot-pick-object' ng-disabled='protected' ng-click='openMediaDrawer()' ng-if='!isEmpty'>Change object</a>" +
-				"<a class='griot-button griot-remove-object' ng-disabled='protected' ng-if='hasImage' ng-click='removeObject()'>Remove object</a>" );
+			var addBtn = angular.element( "<a class='griot-button griot-pick-object' ng-disabled='protected' ng-click='openMediaDrawer()' ng-if='!data.id'>Choose object</a>" +
+				"<a class='griot-button griot-pick-object' ng-disabled='protected' ng-click='openMediaDrawer()' ng-if='data.id'>Change object</a>" +
+				"<a class='griot-button griot-remove-object' ng-disabled='protected' ng-if='data.id' ng-click='removeObject()'>Remove object</a>" );
 			var compiled = $compile( addBtn );
 			elem.closest( '.griot-field-wrap' ).find( '.griot-field-meta' ).append( addBtn );
 			compiled( scope );
 
-			elem.find('.griot-object-selector-thumb').droppable({
+			jQuery( elem ).droppable({
 
-				activate: function(e, ui){
+				tolerance: 'touch',
 
+				over: function(e, ui){
 					scope.$apply( function(){
 						scope.isDroppable = true;
 					});
-
 				},
-				deactivate: function(){
+				out: function(){
 					scope.$apply( function(){
 						scope.isDroppable = false;
 					});
@@ -1655,7 +1664,11 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 			attrs.hasAnnotations = transcrude ? true : false;
 
 			var templateHtml = "<div class='griot-annotated-image'>" +
-				"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$id}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations, isDroppable: isDroppable }' />";
+			"<div class='griot-zoomer griot-prevent-swipe' id='zoomer" + Math.floor( Math.random() * 1000000 ) + "-{{$id}}' ng-class='{ hasAnnotations: hasAnnotations, noAnnotations: !hasAnnotations, isDroppable: isDroppable }'>"+
+				"<p ng-if='!imageID' class='griot-zoomer-notice'>No image selected</p>" +
+			"</div>" +
+			"<p class='griot-zoomer-status griot-zoomer-status-final' ng-if='imageID && imageApproved'><span class='griot-zoomer-status-label'>Final</span> This image has been approved by Visual Resources.</p>" +
+			"<p class='griot-zoomer-status griot-zoomer-status-fpo' ng-if='imageID && !imageApproved'><span class='griot-zoomer-status-label'>Temporary</span> This image may be used as a placeholder, but is likely to change.</p>";
 
 			if( transcrude ) {
 
@@ -1772,7 +1785,7 @@ angular.module( 'griot' ).directive( 'zoomer', function( $http, ModelChain ) {
 
 				if( $scope.hasAnnotations ) {
 
-					if( ! $scope.fpo ){
+					if( $scope.imageApproved ){
 						_this.addDrawingControls();
 					}
 

@@ -19,7 +19,7 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 		tileServer: griotData.tileServer,
 		zoomables: griotData.config,
 		media: []
-	}
+	};
 	
 	// Assemble media
 	for( var objid in $scope.ui.zoomables ){
