@@ -202,28 +202,6 @@ class GriotWP{
 	 *
 	 * @since 0.0.1
 	 */
-	static function register_user_posts_table() {
-
-		global $wpdb;
-
-		$table_name = $wpdb->prefix . "gwp_user_posts";
-
-		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
-			`ID` int(11) NOT NULL AUTO_INCREMENT,
-			`post_id` int(11) NOT NULL,
-			`user_id` int(11) NOT NULL,
-			PRIMARY KEY (`ID`) )";
-
-		$wpdb->query($sql);
-
-	}
-
-
-	/**
-	 * Register user posts table.
-	 *
-	 * @since 0.0.1
-	 */
 	static function register_media_status_table() {
 
 		global $wpdb;

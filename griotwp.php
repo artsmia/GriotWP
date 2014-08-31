@@ -26,8 +26,7 @@ new GriotWP( $templates );
 register_activation_hook( __FILE__, array( 'GriotWP', 'flush_rewrite_rules' ) );
 register_activation_hook( __FILE__, array( 'GriotWP', 'build_record_list' ) );
 
-// Activation: Create tables to link users to posts and media.
-register_activation_hook( __FILE__, array( 'GriotWP', 'register_user_posts_table' ) );
+// Activation: Create table to track media status.
 register_activation_hook( __FILE__, array( 'GriotWP', 'register_media_status_table' ) );
 
 // Deactivation: Update rewrite rules.
