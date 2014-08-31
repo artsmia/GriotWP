@@ -25,21 +25,23 @@ Install GriotWP as you would any other WordPress plugin. GriotWP can be installe
 
 ### Settings
 
-#### Zoomable Images
+#### Tile Server
 
 The **tile server** is a URL the system can query for [TileJSON](https://github.com/mapbox/tilejson-spec) objects describing the set of tiles for a given image. 
 
-Additionally, when accessing your tile server's root directory, GriotWP expects to receive a configuration JSON object linking object IDs to zoomable images. GriotWP uses this information to populate and filter user-facing lists of available objects and zoomable images.
+#### Config
 
-#### Static Images
+The **config** settings represents the location of your config (or 'manifest'), a JSON object linking objects IDs to zoomable images. When not in development, this will probably be the same URL as your tile server, because the tileserver software generates a config automatically. GriotWP uses this information to populate and filter user-facing lists of available objects and zoomable images.
 
-In its default configuration, Griot does not make use of static (i.e. non-zoomable) images. However, a static image field is provided for extensibility, and the static image settings provide some control over the static image workflow.
+#### Image Source
 
-**Image source** tells the system where to look for images that can be attached to objects and stories. 
+Static (i.e. non-zoomable) images are currently used for the thumbnails of objects and stories on the front page of the Griot software. This may change in the near future. In the meantime ...
 
-If "Insert images from WordPress" is selected, GriotWP will use the standard WordPress Media Manager for uploading and selecting images. In this case, the data object returned by GriotWP will reference the image's location within the WordPress wp-content folder. Note that pulling images from WordPress may have repercussions for performance.
+**Image source** tells the system where to look for static images.
 
-"Add a list of available image URLs" allows the administrator to paste in a list of URLs referring to **available static images**. These images will be presented to the user as thumbnails when the image field is used.
+If "Insert images from WordPress" is selected, GriotWP will use the standard WordPress Media Manager for uploading and selecting images. In this case, the data object returned by GriotWP will reference the image's location within the WordPress wp-content folder. Note that pulling images from WordPress may have repercussions for performance!
+
+"Add a list of available image URLs" allows the administrator to paste in a list of URLs referring to available static images. These images will be presented to the user as thumbnails when the image field is used.
 
 ## Endpoints
 
@@ -59,13 +61,13 @@ Or for a specific record by WordPress ID:
 
 ## Extending GriotWP
 
-GriotWP's edit screens are modular to facilitate both small tweaks and major customizations of the application. Form templates (griotwp/templates/) are built from semantic custom tags which can be rearranged, recombined, and nested while maintaining the integrity of the returned data.
+GriotWP's edit screens are modular to facilitate both small tweaks and major customizations of the application. Form templates (griotwp/templates/) are built from semantic custom tags which can be rearranged, combined with standard HTML, and nested. The system will interpret the nesting of field tags to structure the returned data.
 
 ### Repeaters
 
 The `<repeater>` tag allows the user to arbitrarily duplicate the set of fields nested beneath it. 
 
-#### Attributes
+#### Repeater Attributes
 
 **name** _Required_ The unique key that will refer to the array of repeater items in the data object.
 
@@ -75,7 +77,7 @@ The `<repeater>` tag allows the user to arbitrarily duplicate the set of fields 
 
 **label-plural** _Optional_ The user-facing plural label for multiple repeater items. 
 
-### Dynamic Layouts
+### Switches (Dynamic Layouts)
 
 `<switch>` and `<switchgroup>` allow the user to create dynamic content layouts. `<switch>` will render a dropdown which the author can use to select which `<switchgroup>` to use as a layout. 
 
@@ -117,7 +119,7 @@ A static image.
 
 _objectselector_
 
-Dropdown of available object IDs. Note: This field does not list the WordPress IDs of object posts, but rather the (user-defined) IDs assigned to objects in the tile server config.
+Formerly a dropdown of available object IDs, the object selector now allows the user to link an object record to an object in the config by dragging a thumbnail over from the media drawer. The object selector field also displays some object metadata included in the config to ensure the correct object is selected.
 
 _relationship_
 
@@ -139,15 +141,9 @@ _zoomer_
 
 An image zoomer with optional annotations. To enable the annotations repeater, simply nest additional fields within the zoomer. 
 
-_zoomerselector_
-
-Dropdown of zoomable images filtered by the selected object. The zoomerselector inherits the object attribute of its parent zoomer. It can also be used separately as a generic zoomable image selector. To filter by an object in this case, simply define the object attribute on the zoomerselector.
-
 #### Additional Zoomer Field Attributes
 
 Zoomer fields have some special attributes:
-
-**object** _Optional_ The name attribute of an objectselector field whose current value should be used to filter the list of zoomable images. This is passed to a zoomerselector embedded within the zoomer field.
 
 **annotations-name** _Required for annotations_ The unique key that will refer to the array of annotations in the data object.
 
