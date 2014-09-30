@@ -241,10 +241,11 @@ class GriotWP{
 
 		global $wp_query;
 
-		if( ! isset( $wp_query->query_vars['griot'] ) ) {
+		if( $wp_query->query_vars['name'] != 'griot' ) {
 			return;
 		}
 
+		status_header(200);
 		include( 'endpoint.php' );
 
 		exit;
