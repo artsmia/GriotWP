@@ -146,8 +146,8 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 		for( var i = 0; i < images.length; i++ ){
 			var image = images[i];
 			image.object_id = objid;
-			image.id = image.file.split('.tif')[0];
-			image.thumb = $scope.ui.zoomables[ objid ].images[i].thumb = 'http://tiles.dx.artsmia.org/v2/' + image.file.split('.tif')[0] + '/0/0/0.png';
+      image.id = image.file.split(/\.tif|\.jpg|\.png/)[0];
+      image.thumb = $scope.ui.zoomables[ objid ].images[i].thumb = 'http://tiles.dx.artsmia.org/v2/' + image.id + '/0/0/0.png';
 			image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
 			image.object_title = meta.title;
 			$scope.ui.media.push( image );
@@ -155,6 +155,7 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 	}
 
 });
+
 /**
  * annotations="" directive
  *
