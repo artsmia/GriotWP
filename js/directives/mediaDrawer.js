@@ -22,7 +22,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 				"<div class='griot-media-thumb' ng-repeat='image in filteredMedia = (ui.media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:quantity)' >" +
 					"<img class='griot-media-image' ng-src='{{image.thumb}}' data-object-id='{{image.object_id}}' data-image-id='{{image.id}}' data-object-title='{{image.object_title}}' data-image-approved='{{image.approved}}' media-drag />" +
 				"</div>" +
-				"<p ng-hide='filteredMedia.length'>No results. <span ng-if='filterByObject'>Try un-checking 'Current object media only'.</p>" +
+				"<p ng-hide='filteredMedia.length'>No results. <a ng-click='toggleCurrentMediaFilter()' ng-if='filterByObject'>Try un-checking 'Current object media only'.</p>" +
 			"</div>" +
 		"</div>",
 		controller: function( $scope, $element, $attrs ){
@@ -35,6 +35,9 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 			$scope.toggle = function(){
 				$rootScope.mediaVisible = ! $rootScope.mediaVisible;
 			};
+			$scope.toggleCurrentMediaFilter = function() {
+				$scope.filterByObject = !$scope.filterByObject
+			}
 		},
 		link: function( scope, elem, attrs ) {
 		}
