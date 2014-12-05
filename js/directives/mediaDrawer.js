@@ -27,7 +27,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 		controller: function( $scope, $element, $attrs ){
 
 			// Show this many images at once
-			$scope.quantity = 50;
+			$scope.quantity = 100;
 
 			$rootScope.mediaVisible = false;
 			$scope.toggle = function(){
