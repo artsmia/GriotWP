@@ -978,6 +978,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 		"</div>",
 		controller: function( $scope, $element, $attrs ){
 
+			if($scope.data.id) $scope.filterByObject = true
 			// Show this many images at once
 			$scope.quantity = 100;
 
