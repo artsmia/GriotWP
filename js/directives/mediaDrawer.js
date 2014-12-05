@@ -14,7 +14,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 			"<div class='griot-media-controls'>" +
 				"<h2 class='griot-media-header'>Available Media</h2>" +
 				"<p class='griot-media-instructions'>Drag to the left panel to insert.</p>" +
-				"<input class='griot-media-search' type='text' ng-model='mediaSearch.meta' id='griot-media-search' placeholder='Search media' />" +
+				"<input class='griot-media-search' type='text' ng-model='mediaSearch' id='griot-media-search' placeholder='Search media' />" +
 				"<input class='griot-media-filter-by-object' type='checkbox' ng-model='filterByObject' id='griot-media-filter-by-object' />" +
 				"<label class='griot-media-label' for='griot-media-filter-by-object'>Current object media only</label>" +
 			"</div>" +
