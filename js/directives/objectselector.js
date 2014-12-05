@@ -22,6 +22,7 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 						"<tr><td>Dates</td><td>{{ui.zoomables[data.id].meta.dated}}</td></tr>" +
 						"<tr><td>Location</td><td>{{ui.zoomables[data.id].meta.country}}, {{ui.zoomables[data.id].meta.continent}}</td></tr>" +
 						"<tr><td>Medium</td><td>{{ui.zoomables[data.id].meta.medium}}</td></tr>" +
+						"<tr><td>Thumbnail</td><td><img src='http://api.artsmia.org/images/{{data.id}}/small.jpg'></td></tr>" +
 					"</table>" +
 				"</div>" +
 			"</div>";
@@ -31,6 +32,9 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 
 			var _this = this;
 
+			if($scope.data.id && $scope.data.thumbnail == undefined) {
+				$scope.data.thumbnail = "http://api.artsmia.org/images/"+$scope.data.id+"/large.jpg"
+			}
 			$scope.isDroppable = false;
 			$scope.isEmpty = 'undefined' === typeof $scope.model[ $attrs.name ];
 			$scope.backgroundImage = $scope.data.id ? 'url(' + $scope.ui.zoomables[ $scope.model[ $attrs.name ] ].images[0].thumb + ')': '';
@@ -67,6 +71,7 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
         $scope.data.meta1 = artist + ', ' + ( culture && culture + ', ' ) + country;
         $scope.data.meta2 = dated;
         $scope.data.meta3 = ( medium && medium + "\n" ) + ( dimension && dimension + "\n" ) + ( creditline && creditline + "\n" ) + accession_number;
+        $scope.data.thumbnail = "http://api.artsmia.org/images/"+$scope.data.id+"/large.jpg"
 			};
 
 			$scope.removeObject = function(){

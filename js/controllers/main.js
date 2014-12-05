@@ -20,16 +20,18 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 		zoomables: griotData.config,
 		media: []
 	};
-	
+
 	// Assemble media
 	for( var objid in $scope.ui.zoomables ){
-		var meta = $scope.ui.zoomables[ objid ].meta;
-		var images = $scope.ui.zoomables[ objid ].images;
+		var zoomable = $scope.ui.zoomables[ objid ]
+		if(zoomable.meta == undefined) return
+		var meta = zoomable.meta;
+		var images = zoomable.images;
 		for( var i = 0; i < images.length; i++ ){
 			var image = images[i];
 			image.object_id = objid;
       image.id = image.file.split(/\.tif|\.jpg|\.png/)[0];
-      image.thumb = $scope.ui.zoomables[ objid ].images[i].thumb = 'http://tiles.dx.artsmia.org/v2/' + image.id + '/0/0/0.png';
+			image.thumb = images[i].thumb = 'http://tiles.dx.artsmia.org/' + image.id + '/0/0/0.png';
 			image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
 			image.object_title = meta.title;
 			$scope.ui.media.push( image );

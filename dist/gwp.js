@@ -138,16 +138,18 @@ angular.module( 'griot' ).controller( 'griotCtrl', function( $scope, $http, Mode
 		zoomables: griotData.config,
 		media: []
 	};
-	
+
 	// Assemble media
 	for( var objid in $scope.ui.zoomables ){
-		var meta = $scope.ui.zoomables[ objid ].meta;
-		var images = $scope.ui.zoomables[ objid ].images;
+		var zoomable = $scope.ui.zoomables[ objid ]
+		if(zoomable.meta == undefined) return
+		var meta = zoomable.meta;
+		var images = zoomable.images;
 		for( var i = 0; i < images.length; i++ ){
 			var image = images[i];
 			image.object_id = objid;
       image.id = image.file.split(/\.tif|\.jpg|\.png/)[0];
-      image.thumb = $scope.ui.zoomables[ objid ].images[i].thumb = 'http://tiles.dx.artsmia.org/v2/' + image.id + '/0/0/0.png';
+			image.thumb = images[i].thumb = 'http://tiles.dx.artsmia.org/' + image.id + '/0/0/0.png';
 			image.meta = [ meta.artist, meta.continent, meta.country, meta.creditline, meta.culture, meta.description, meta.medium, meta.title ].join(' ');
 			image.object_title = meta.title;
 			$scope.ui.media.push( image );
@@ -1012,6 +1014,7 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 						"<tr><td>Dates</td><td>{{ui.zoomables[data.id].meta.dated}}</td></tr>" +
 						"<tr><td>Location</td><td>{{ui.zoomables[data.id].meta.country}}, {{ui.zoomables[data.id].meta.continent}}</td></tr>" +
 						"<tr><td>Medium</td><td>{{ui.zoomables[data.id].meta.medium}}</td></tr>" +
+						"<tr><td>Thumbnail</td><td><img src='http://api.artsmia.org/images/{{data.id}}/small.jpg'></td></tr>" +
 					"</table>" +
 				"</div>" +
 			"</div>";
@@ -1021,6 +1024,9 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 
 			var _this = this;
 
+			if($scope.data.id && $scope.data.thumbnail == undefined) {
+				$scope.data.thumbnail = "http://api.artsmia.org/images/"+$scope.data.id+"/large.jpg"
+			}
 			$scope.isDroppable = false;
 			$scope.isEmpty = 'undefined' === typeof $scope.model[ $attrs.name ];
 			$scope.backgroundImage = $scope.data.id ? 'url(' + $scope.ui.zoomables[ $scope.model[ $attrs.name ] ].images[0].thumb + ')': '';
@@ -1057,6 +1063,7 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
         $scope.data.meta1 = artist + ', ' + ( culture && culture + ', ' ) + country;
         $scope.data.meta2 = dated;
         $scope.data.meta3 = ( medium && medium + "\n" ) + ( dimension && dimension + "\n" ) + ( creditline && creditline + "\n" ) + accession_number;
+        $scope.data.thumbnail = "http://api.artsmia.org/images/"+$scope.data.id+"/large.jpg"
 			};
 
 			$scope.removeObject = function(){
