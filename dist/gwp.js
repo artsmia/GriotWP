@@ -990,6 +990,7 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 	};
 
 });
+
 /**
  * <zoomer> directive
  *
@@ -1111,16 +1112,13 @@ angular.module( 'griot' ).directive( 'objectselector', function( ModelChain, $co
 						scope.model[ attrs.name ] = ui.helper.data('object-id').toString();
 						scope.updateThumb( ui.helper );
 
-						if( ui.helper.data('object-id').toString() !== oldID && confirm( 'Auto-update metadata?' ) ){
-							scope.autoUpdateMeta();
-						}
-
 					});
 				}
 			});
 		}
 	};
 });
+
 /**
  * <repeater> directive
  *
