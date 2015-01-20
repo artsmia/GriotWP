@@ -494,6 +494,13 @@ class GriotWP{
 
 	}
 
+	function disable_fancy_TinyMCE_paste_features($in) {
+		$in['paste_remove_styles'] = true;
+		$in['paste_remove_spans'] = true;
+		$in['paste_strip_class_attributes'] = 'all';
+		$in['paste_text_use_dialog'] = false;
+		return $in;
+	}
 
 	/**
 	 * Register metabox for related posts field
@@ -1046,6 +1053,9 @@ class GriotWP{
 		// Add config callback for settings page
 		add_action( 'wp_ajax_griot_get_config', array( $this, 'check_config' ) );
 		add_action( 'wp_ajax_griot_track_media', array( $this, 'update_media_tracking' ) );
+
+		// Don't let pasting from web browsers or Word cause invalid JSON problems.
+		add_filter('tiny_mce_before_init', 'disable_fancy_TinyMCE_paste_features');
 
 	}
 
