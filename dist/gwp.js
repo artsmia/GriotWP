@@ -43,6 +43,24 @@ jQuery( document ).ready( function() {
 	angular.bootstrap( document, ['griot'] );
 
 });
+
+/*
+ * this swallows backspace keys on any non-input element.
+ * stops backspace -> back
+ * http://stackoverflow.com/a/8218367
+ */
+jQuery(function(){
+  var rx = /INPUT|SELECT|TEXTAREA/i;
+
+  jQuery(document).bind("keydown keypress", function(e){
+    if( e.which == 8 || e.which == 13 ){ // 8 == backspace, 13 = enter
+      if(!rx.test(e.target.tagName) || e.target.disabled || e.target.readOnly ){
+        e.preventDefault();
+      }
+    }
+  });
+});
+
 jQuery( document ).ready( function() {
 
 	/** 
@@ -965,9 +983,11 @@ angular.module( 'griot' ).directive( 'mediaDrawer', function( $http, $rootScope 
 			"<div class='griot-media-controls'>" +
 				"<h2 class='griot-media-header'>Available Media</h2>" +
 				"<p class='griot-media-instructions'>Drag to the left panel to insert.</p>" +
+				"<form ng-sumbit='false'>" +
 				"<input class='griot-media-search' type='text' ng-model='mediaSearch.meta' id='griot-media-search' placeholder='Search media' />" +
 				"<input class='griot-media-filter-by-object' type='checkbox' ng-model='filterByObject' id='griot-media-filter-by-object' />" +
 				"<label class='griot-media-label' for='griot-media-filter-by-object'>Current object media only</label>" +
+				"</form>" +
 			"</div>" +
 			"<div class='griot-media-window'>" +
 				"<div class='griot-media-thumb' ng-repeat='image in ui.media | filterMediaByObject:filterByObject:data.id | filter:mediaSearch | limitTo:quantity' >" +

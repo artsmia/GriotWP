@@ -43,3 +43,20 @@ jQuery( document ).ready( function() {
 	angular.bootstrap( document, ['griot'] );
 
 });
+
+/*
+ * this swallows backspace keys on any non-input element.
+ * stops backspace -> back
+ * http://stackoverflow.com/a/8218367
+ */
+jQuery(function(){
+  var rx = /INPUT|SELECT|TEXTAREA/i;
+
+  jQuery(document).bind("keydown keypress", function(e){
+    if( e.which == 8 || e.which == 13 ){ // 8 == backspace, 13 = enter
+      if(!rx.test(e.target.tagName) || e.target.disabled || e.target.readOnly ){
+        e.preventDefault();
+      }
+    }
+  });
+});
